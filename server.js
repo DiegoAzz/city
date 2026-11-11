@@ -17,27 +17,13 @@ const distPath = path.join(__dirname, 'dist');
 // Serve static build assets
 app.use(express.static(distPath));
 
-// SPA fallback: all routes serve index.html
-app.get('*', (_req, res) => {
+// SPA fallback: all unmatched routes serve index.html
+app.use((_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Multiplayer WebSocket Server
-interface ConnectedPlayer {
-  id: string;
-  name: string;
-  color: number;
-  lng: number;
-  lat: number;
-  altitude: number;
-  bearing: number;
-  speed: number;
-  mode: string;
-  animState: string;
-  lastActive: number;
-}
-
-const clients = new Map<string, { ws: any; player: ConnectedPlayer }>();
+const clients = new Map();
 
 server.on('upgrade', (request, socket, head) => {
   const url = new URL(request.url || '', `http://${request.headers.host}`);
@@ -51,7 +37,7 @@ server.on('upgrade', (request, socket, head) => {
 });
 
 wss.on('connection', (ws) => {
-  let clientId: string | null = null;
+  let clientId = null;
 
   ws.on('message', (raw) => {
     try {
@@ -80,23 +66,28 @@ wss.on('connection', (ws) => {
         });
       } else if (msg.type === 'move') {
         if (clientId && clients.has(clientId)) {
-          const entry = clients.get(clientId)!;
-          entry.player = { ...entry.player, ...msg.player, lastActive: Date.now() };
-          broadcastExcept(clientId, {
-            type: 'peer-update',
-            player: entry.player
-          });
+          const entry = clients.get(clientId);
+          if (entry) {
+            entry.player = { ...entry.player, ...msg.player, lastActive: Date.now() };
+            broadcastExcept(clientId, {
+              type: 'peer-update',
+              player: entry.player
+            });
+          }
         }
       } else if (msg.type === 'chat') {
         if (clientId && clients.has(clientId)) {
-          const sender = clients.get(clientId)!.player;
-          broadcast({
-            type: 'chat-message',
-            id: clientId,
-            senderName: sender.name,
-            text: msg.text,
-            timestamp: Date.now()
-          });
+          const entry = clients.get(clientId);
+          if (entry) {
+            const sender = entry.player;
+            broadcast({
+              type: 'chat-message',
+              id: clientId,
+              senderName: sender.name,
+              text: msg.text,
+              timestamp: Date.now()
+            });
+          }
         }
       }
     } catch (e) {
@@ -116,7 +107,7 @@ wss.on('connection', (ws) => {
   });
 });
 
-function broadcast(obj: any): void {
+function broadcast(obj) {
   const payload = JSON.stringify(obj);
   for (const { ws } of clients.values()) {
     if (ws.readyState === 1) { // 1 = OPEN
@@ -125,7 +116,7 @@ function broadcast(obj: any): void {
   }
 }
 
-function broadcastExcept(excludeId: string, obj: any): void {
+function broadcastExcept(excludeId, obj) {
   const payload = JSON.stringify(obj);
   for (const [id, { ws }] of clients.entries()) {
     if (id !== excludeId && ws.readyState === 1) {
