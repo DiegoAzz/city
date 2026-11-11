@@ -17,6 +17,11 @@ const distPath = path.join(__dirname, 'dist');
 // Serve static build assets
 app.use(express.static(distPath));
 
+// Healthcheck endpoint for Coolify / Docker
+app.get('/health', (_req, res) => {
+  res.status(200).send('OK');
+});
+
 // SPA fallback: all unmatched routes serve index.html
 app.use((_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));

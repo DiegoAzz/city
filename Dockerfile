@@ -22,6 +22,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Install curl for Coolify healthcheck
+RUN apk add --no-cache curl
+
 # Install production dependencies only
 COPY package*.json ./
 RUN npm ci --omit=dev
@@ -33,9 +36,9 @@ COPY server.js ./
 # Expose standard web port
 EXPOSE 3000
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+# Healthcheck endpoint
+HEALTHCHECK --interval=20s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
 
 # Start the Node.js production server with WebSocket multiplayer
 CMD ["node", "server.js"]
