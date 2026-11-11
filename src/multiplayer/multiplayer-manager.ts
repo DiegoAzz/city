@@ -18,6 +18,7 @@ export class MultiplayerManager {
   private lastSyncTime: number = 0;
   private onPlayerCountCallbacks: Array<(count: number) => void> = [];
   private onChatMessageCallbacks: Array<(msg: ChatMessage) => void> = [];
+  private onPlayerJoinedCallbacks: Array<(name: string) => void> = [];
 
   constructor(characterController: CharacterController) {
     this.characterController = characterController;
@@ -69,6 +70,10 @@ export class MultiplayerManager {
     this.onChatMessageCallbacks.push(cb);
   }
 
+  public onPlayerJoined(cb: (name: string) => void): void {
+    this.onPlayerJoinedCallbacks.push(cb);
+  }
+
   private connect(): void {
     try {
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -117,6 +122,7 @@ export class MultiplayerManager {
         this.notifyPlayerCount();
         if (msg.player && this.scene) {
           this.addOrUpdateRemotePlayer(msg.player);
+          this.onPlayerJoinedCallbacks.forEach((cb) => cb(msg.player.name || 'Nuevo ciudadano'));
         }
         break;
 

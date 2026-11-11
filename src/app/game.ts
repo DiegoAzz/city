@@ -115,6 +115,11 @@ export class Game {
         this.soundSystem
       );
 
+      // Announce when another citizen joins the multiplayer room
+      this.multiplayer.onPlayerJoined((name) => {
+        this.hud?.showToast(`👋 ¡${name} se ha conectado a Cartagena!`, 3200);
+      });
+
       // Connect quality updates to MapLibre
       this.qualityManager.onProfileChange((profile) => {
         this.mapManager.setPixelRatio(profile.dpr);

@@ -20,27 +20,39 @@ export class ChatUi {
     this.container = document.createElement('div');
     this.container.className = 'chat-system';
     this.container.innerHTML = `
-      <!-- Floating Chat Toggle Pill -->
-      <button id="btn-chat-toggle" class="chat-toggle-pill" aria-label="Abrir Chat de Ciudadanos">
-        <span class="chat-icon">💬</span>
-        <span class="chat-label">Chat</span>
+      <!-- Floating Chat Toggle Pill (Mobile fallback) -->
+      <button id="btn-chat-toggle" class="chat-toggle-pill" aria-label="Abrir Multijugador y Chat">
+        <span class="chat-icon">👥</span>
+        <span class="chat-label">Multijugador</span>
         <span id="chat-unread-badge" class="chat-unread hidden">0</span>
       </button>
 
-      <!-- Expandable Gamer Chat Drawer -->
+      <!-- Expandable Gamer Multiplayer & Chat Drawer -->
       <div id="chat-drawer" class="chat-drawer hidden">
         <div class="chat-header">
           <div class="chat-title">
             <span class="pulse-dot-green"></span>
-            <span>Chat Ciudadano</span>
+            <span>Multijugador en Vivo</span>
             <span id="chat-player-count" class="chat-count-chip">1 online</span>
           </div>
           <button id="btn-chat-close" class="chat-close-btn" aria-label="Cerrar">✕</button>
         </div>
 
+        <!-- Invite Friends Bar -->
+        <div class="chat-share-box">
+          <div class="chat-share-info">
+            <span class="chat-share-tag">🌐 Sala Pública</span>
+            <p class="chat-share-text">Todos los que abran esta página juegan juntos en el mismo mapa de Cartagena.</p>
+          </div>
+          <button id="btn-copy-invite" class="chat-copy-btn" type="button">
+            <span class="copy-icon">📋</span>
+            <span id="copy-btn-label">Copiar Enlace para Compartir</span>
+          </button>
+        </div>
+
         <div class="chat-name-row">
-          <label>Tu nombre:</label>
-          <input type="text" id="chat-name-input" maxlength="16" value="${this.escapeHtml(this.multiplayer.getPlayerName())}" />
+          <label>Tu Apodo:</label>
+          <input type="text" id="chat-name-input" maxlength="16" value="${this.escapeHtml(this.multiplayer.getPlayerName())}" placeholder="Tu nombre..." />
         </div>
 
         <!-- Quick Emote / Reaction Chips -->
@@ -55,7 +67,7 @@ export class ChatUi {
 
         <!-- Messages History Feed -->
         <div id="chat-messages" class="chat-messages">
-          <div class="chat-system-msg">¡Bienvenido a Cartagena Multijugador! Escribe un mensaje o usa un emote para interactuar.</div>
+          <div class="chat-system-msg">¡Bienvenido a Cartagena Multijugador! Comparte el enlace con un amigo para explorar juntos.</div>
         </div>
 
         <!-- Input Bar -->
@@ -66,7 +78,8 @@ export class ChatUi {
       </div>
     `;
 
-    document.body.appendChild(this.container);
+    const appEl = document.getElementById('app') || document.body;
+    appEl.appendChild(this.container);
 
     this.btnToggle = document.getElementById('btn-chat-toggle')!;
     this.chatDrawer = document.getElementById('chat-drawer')!;
@@ -81,16 +94,50 @@ export class ChatUi {
 
     // Listen for player count changes
     this.multiplayer.onPlayerCountChange((count) => {
-      const el = document.getElementById('chat-player-count');
-      if (el) el.textContent = `${count} online`;
+      const drawerCount = document.getElementById('chat-player-count');
+      if (drawerCount) drawerCount.textContent = `${count} online`;
+
+      const headerCount = document.getElementById('header-player-count');
+      if (headerCount) headerCount.textContent = `${count} Online`;
     });
   }
 
   private bindEvents(): void {
-    this.btnToggle.addEventListener('click', () => this.toggle());
+    this.btnToggle?.addEventListener('click', () => this.toggle());
+
+    // Top-bar Multiplayer badge opens the hub
+    const btnHub = document.getElementById('btn-multiplayer-hub');
+    btnHub?.addEventListener('click', () => this.toggle());
 
     const btnClose = document.getElementById('btn-chat-close');
     btnClose?.addEventListener('click', () => this.close());
+
+    // Copy Invite URL Button
+    const btnCopy = document.getElementById('btn-copy-invite');
+    btnCopy?.addEventListener('click', async () => {
+      const url = window.location.href;
+      const label = document.getElementById('copy-btn-label');
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        if (label) {
+          label.textContent = '✅ ¡Copiado! Pégalo en WhatsApp';
+          setTimeout(() => {
+            if (label) label.textContent = 'Copiar Enlace para Compartir';
+          }, 3500);
+        }
+      } catch {
+        if (label) label.textContent = 'Enlace: ' + url;
+      }
+    });
 
     // Send on form submit
     const form = document.getElementById('chat-form');
