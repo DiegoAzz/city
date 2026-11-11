@@ -39,11 +39,15 @@ export class Game {
     // 1. Load preferences
     const prefs = LocalStore.load();
 
-    // 2. Determine initial coordinates (use saved position if valid)
+    // 2. Determine initial coordinates: Start cleanly in wide open Plaza Santo Domingo
     let initialLng = CARTAGENA_CONFIG.initialCenter[0];
     let initialLat = CARTAGENA_CONFIG.initialCenter[1];
 
-    if (prefs.lastPosition && isWithinCartagenaBounds(prefs.lastPosition[0], prefs.lastPosition[1])) {
+    if (
+      prefs.lastPosition &&
+      isWithinCartagenaBounds(prefs.lastPosition[0], prefs.lastPosition[1]) &&
+      Math.abs(prefs.lastPosition[1] - 10.4233) > 0.0005 // Discard old buggy coordinate inside building wall
+    ) {
       initialLng = prefs.lastPosition[0];
       initialLat = prefs.lastPosition[1];
     }
@@ -81,37 +85,15 @@ export class Game {
       this.collisionSystem.init(map);
       this.character.setCollisionSystem(this.collisionSystem);
 
-      // Warning when player hits water on foot or land vehicle
+      // Non-intrusive warning when player reaches water edge
       this.collisionSystem.onWaterWarning(() => {
-        this.hud?.showDialog({
-          category: 'Alerta Costera',
-          icon: '🌊',
-          title: '¡Imposible cruzar por tierra!',
-          message: 'Hay agua frente a ti en la bahía o mar de Cartagena. Para continuar tu recorrido por el agua, aborda una lancha o barco.',
-          primaryAction: {
-            text: '🚤 Abordar Barco',
-            onClick: () => this.hud?.setVehicleMode('boat', true)
-          },
-          secondaryAction: { text: 'Quedarme en tierra' },
-          durationMs: 5000
-        });
         this.soundSystem.playWaterWarning();
+        this.hud?.showToast('🌊 ¡Agua frente a ti! Usa 🚤 Barco para navegar', 2400);
       });
 
-      // Notification when boat reaches shore or dock
+      // Non-intrusive notification when boat reaches shore or dock
       this.collisionSystem.onLandWarning(() => {
-        this.hud?.showDialog({
-          category: 'Muelle de Desembarque',
-          icon: '⚓',
-          title: '¡Llegaste a tierra firme!',
-          message: 'El barco solo puede navegar en el agua. Desembarca para caminar o conducir libremente por las calles de Cartagena.',
-          primaryAction: {
-            text: '🚶 Desembarcar a Pie',
-            onClick: () => this.hud?.setVehicleMode('foot')
-          },
-          secondaryAction: { text: 'Permanecer aquí' },
-          durationMs: 5000
-        });
+        this.hud?.showToast('⚓ ¡Llegaste a la orilla! Toca 🚶 Pie para desembarcar', 2400);
       });
 
       // Connect multiplayer manager to Three.js custom layer

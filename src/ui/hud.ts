@@ -147,18 +147,13 @@ export class Hud {
 
     // Recenter / Rescue button: Centers camera and places explorer in open Plaza Santo Domingo
     this.btnRecenter?.addEventListener('click', () => {
-      const defaultLng = -75.5520;
-      const defaultLat = 10.4233;
+      const defaultLng = -75.55200;
+      const defaultLat = 10.42432;
       this.characterController.setPosition(defaultLng, defaultLat);
       this.cameraController.recenterImmediate(defaultLng, defaultLat);
-      this.showDialog({
-        category: 'Centro Histórico',
-        icon: '🎯',
-        title: '¡Plaza Santo Domingo!',
-        message: 'Has sido ubicado en el corazón del Centro Histórico de Cartagena, en una calle amplia y libre de obstáculos.',
-        secondaryAction: { text: '¡A Explorar!' },
-        durationMs: 4000
-      });
+      this.setVehicleMode('foot');
+      this.closeDialog();
+      this.showToast('🎯 Explorador en Plaza Santo Domingo (calle abierta)');
     });
 
     // Space key to Jump
@@ -267,19 +262,7 @@ export class Hud {
 
     if (isNearWater && !this.wasNearWater) {
       this.setBoatEnabled(true);
-      this.soundSystem.playWaterSplash();
-      this.showDialog({
-        category: 'Bahía de Cartagena',
-        icon: '🌊',
-        title: '¡Orilla del Mar Alcanzada!',
-        message: 'Has llegado a la costa del mar Caribe. El barco ya está habilitado en tu menú lateral o puedes abordarlo ahora mismo.',
-        primaryAction: {
-          text: '🚤 Abordar Barco',
-          onClick: () => this.setVehicleMode('boat', true)
-        },
-        secondaryAction: { text: 'Seguir a pie' },
-        durationMs: 6000
-      });
+      this.showToast('🌊 Orilla del mar: 🚤 Barco habilitado en el menú', 2200);
     } else if (!isNearWater && this.wasNearWater) {
       this.setBoatEnabled(false);
     }

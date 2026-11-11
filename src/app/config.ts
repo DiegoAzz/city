@@ -20,8 +20,8 @@ export interface CityConfig {
 export const CARTAGENA_CONFIG: CityConfig = {
   name: 'Cartagena',
   country: 'Colombia',
-  // Plaza Santo Domingo
-  initialCenter: [-75.5520, 10.4233],
+  // Plaza de Santo Domingo (Open historic plaza, wide outdoor space)
+  initialCenter: [-75.55200, 10.42432],
   initialZoom: 18.2,
   initialPitch: 54, // Isometric tilt
   initialBearing: 30,

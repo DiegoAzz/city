@@ -26,7 +26,7 @@ export class CollisionSystem {
   private onLandWarningCallbacks: Array<() => void> = [];
   private lastWaterWarningTime: number = 0;
   private lastLandWarningTime: number = 0;
-  private readonly WARNING_COOLDOWN_MS: number = 3200;
+  private readonly WARNING_COOLDOWN_MS: number = 6000;
 
   constructor() {}
 
