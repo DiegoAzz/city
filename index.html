@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+  <title>Street Explorer Mobile</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Map Container -->
+    <div id="map-container"></div>
+
+    <!-- HUD Overlay -->
+    <div id="hud-container">
+      <!-- Top Bar -->
+      <header class="hud-top">
+        <div class="hud-chip location-badge" title="Toca para alternar telemetría">
+          <span class="location-dot"></span>
+          <span class="location-name">Cartagena</span>
+        </div>
+        <div class="hud-top-actions">
+          <button id="btn-sound" class="hud-btn hud-btn-round" aria-label="Sonido" title="Alternar Sonido">
+            <span id="sound-icon" class="btn-icon">🔊</span>
+          </button>
+          <button id="btn-quality" class="hud-btn hud-chip" aria-label="Calidad gráfica" title="Perfil de rendimiento">
+            <span id="quality-indicator">⚡ 45 FPS</span>
+          </button>
+          <button id="btn-stream" class="hud-btn hud-btn-round" aria-label="Modo transmisión" title="Ocultar interfaz">
+            <span class="btn-icon">📺</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Camera & Zoom Control Dock (Top Right) -->
+      <div class="camera-dock" aria-label="Controles de Cámara y Zoom">
+        <button id="btn-zoom-in" class="hud-btn hud-btn-round action-zoom" aria-label="Agrandar" title="Agrandar">
+          <span class="btn-icon">➕</span>
+        </button>
+        <button id="btn-zoom-out" class="hud-btn hud-btn-round action-zoom" aria-label="Alejar" title="Alejar">
+          <span class="btn-icon">➖</span>
+        </button>
+        <button id="btn-rotate" class="hud-btn hud-btn-round action-rotate" aria-label="Girar Ángulo" title="Girar Ángulo 45°">
+          <span class="btn-icon">🔄</span>
+        </button>
+        <button id="btn-camera" class="hud-btn hud-chip action-camera" aria-label="Modo de Cámara" title="Cambiar Perspectiva">
+          <span class="btn-icon">🎥</span>
+          <span id="camera-label" class="btn-text">ISO</span>
+        </button>
+      </div>
+
+      <!-- Dev Metrics Overlay (Hidden by default, tap Cartagena to toggle) -->
+      <div id="perf-overlay" class="perf-stats hidden">
+        <div class="stat-row"><strong>FPS:</strong> <span id="stat-fps">--</span> (<span id="stat-target">45</span> cap)</div>
+        <div class="stat-row"><strong>Frame:</strong> <span id="stat-ms">--</span> ms</div>
+        <div class="stat-row"><strong>DPR:</strong> <span id="stat-dpr">1.25</span></div>
+        <div class="stat-row"><strong>Coord:</strong> <span id="stat-coords">10.4233, -75.5520</span></div>
+        <div class="stat-row"><strong>Velocidad:</strong> <span id="stat-speed">0.0 m/s</span></div>
+      </div>
+
+      <!-- Notification Toast -->
+      <div id="toast" class="toast hidden"></div>
+
+      <!-- Gamer Left Dock: Mobility / Vehicle Selection (Side Menu) -->
+      <aside class="gamer-dock-left" aria-label="Selector de Vehículo">
+        <button class="mode-pill active" data-mode="foot" aria-label="A pie">
+          <span class="mode-icon">🚶</span>
+          <span class="mode-text">Pie</span>
+        </button>
+        <button class="mode-pill" data-mode="bicycle" aria-label="Bicicleta">
+          <span class="mode-icon">🚲</span>
+          <span class="mode-text">Bici</span>
+        </button>
+        <button class="mode-pill" data-mode="motorcycle" aria-label="Moto">
+          <span class="mode-icon">🛵</span>
+          <span class="mode-text">Moto</span>
+        </button>
+        <button class="mode-pill" data-mode="car" aria-label="Carro">
+          <span class="mode-icon">🚗</span>
+          <span class="mode-text">Carro</span>
+        </button>
+        <button class="mode-pill" data-mode="boat" aria-label="Barco">
+          <span class="mode-icon">🚤</span>
+          <span class="mode-text">Barco</span>
+        </button>
+      </aside>
+
+      <!-- Bottom Touch Controls Area -->
+      <footer class="hud-bottom">
+        <!-- Left: Virtual Joystick Zone -->
+        <div id="joystick-zone" class="joystick-zone">
+          <div id="joystick-base" class="joystick-base">
+            <div id="joystick-stick" class="joystick-stick"></div>
+          </div>
+        </div>
+
+        <!-- Right Gamer Action Cluster: Vertical Side Stack -->
+        <div class="gamer-dock-right">
+          <button id="btn-jump" class="hud-btn hud-btn-circle action-jump" aria-label="Saltar">
+            <span class="btn-icon">🦘</span>
+            <span class="btn-text">Salto</span>
+          </button>
+          <button id="btn-horn" class="hud-btn hud-btn-circle action-horn" aria-label="Bocina / Campana" title="Tocar Bocina">
+            <span class="btn-icon">📢</span>
+            <span class="btn-text">Bocina</span>
+          </button>
+          <button id="btn-run" class="hud-btn hud-btn-circle action-run" aria-label="Turbo">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-text">Turbo</span>
+          </button>
+          <button id="btn-recenter" class="hud-btn hud-btn-circle action-recenter" aria-label="Centrar personaje">
+            <span class="btn-icon">🎯</span>
+            <span class="btn-text">Centrar</span>
+          </button>
+        </div>
+      </footer>
+
+      <!-- Map Attribution Footer (OpenStreetMap & MapLibre) -->
+      <div class="map-attribution-bar">
+        <span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors | Street Explorer Mobile</span>
+      </div>
+    </div>
+
+    <!-- Global High-Priority Restore Button (Outside HUD container so never dimmed) -->
+    <button id="btn-exit-stream" class="exit-stream-pill hidden" aria-label="Restaurar Controles">
+      <span class="btn-icon">👁️</span>
+      <span>Restaurar Controles</span>
+    </button>
+  </div>
+
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

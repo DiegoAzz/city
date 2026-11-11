@@ -1,0 +1,141 @@
+import express from 'express';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { WebSocketServer } from 'ws';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ noServer: true });
+
+const PORT = process.env.PORT || 3000;
+const distPath = path.join(__dirname, 'dist');
+
+// Serve static build assets
+app.use(express.static(distPath));
+
+// SPA fallback: all routes serve index.html
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
+// Multiplayer WebSocket Server
+interface ConnectedPlayer {
+  id: string;
+  name: string;
+  color: number;
+  lng: number;
+  lat: number;
+  altitude: number;
+  bearing: number;
+  speed: number;
+  mode: string;
+  animState: string;
+  lastActive: number;
+}
+
+const clients = new Map<string, { ws: any; player: ConnectedPlayer }>();
+
+server.on('upgrade', (request, socket, head) => {
+  const url = new URL(request.url || '', `http://${request.headers.host}`);
+  if (url.pathname === '/ws/multiplayer') {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+
+wss.on('connection', (ws) => {
+  let clientId: string | null = null;
+
+  ws.on('message', (raw) => {
+    try {
+      const msg = JSON.parse(raw.toString());
+
+      if (msg.type === 'join') {
+        clientId = msg.player.id;
+        clients.set(clientId, { ws, player: { ...msg.player, lastActive: Date.now() } });
+
+        // Send existing peers to newly joined player
+        const existingPeers = Array.from(clients.entries())
+          .filter(([id]) => id !== clientId)
+          .map(([_, c]) => c.player);
+
+        ws.send(JSON.stringify({
+          type: 'lobby-state',
+          peers: existingPeers,
+          count: clients.size
+        }));
+
+        // Broadcast new player joined to all peers
+        broadcastExcept(clientId, {
+          type: 'player-joined',
+          player: msg.player,
+          count: clients.size
+        });
+      } else if (msg.type === 'move') {
+        if (clientId && clients.has(clientId)) {
+          const entry = clients.get(clientId)!;
+          entry.player = { ...entry.player, ...msg.player, lastActive: Date.now() };
+          broadcastExcept(clientId, {
+            type: 'peer-update',
+            player: entry.player
+          });
+        }
+      } else if (msg.type === 'chat') {
+        if (clientId && clients.has(clientId)) {
+          const sender = clients.get(clientId)!.player;
+          broadcast({
+            type: 'chat-message',
+            id: clientId,
+            senderName: sender.name,
+            text: msg.text,
+            timestamp: Date.now()
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[MultiplayerServer] Message error:', e);
+    }
+  });
+
+  ws.on('close', () => {
+    if (clientId && clients.has(clientId)) {
+      clients.delete(clientId);
+      broadcast({
+        type: 'player-left',
+        id: clientId,
+        count: clients.size
+      });
+    }
+  });
+});
+
+function broadcast(obj: any): void {
+  const payload = JSON.stringify(obj);
+  for (const { ws } of clients.values()) {
+    if (ws.readyState === 1) { // 1 = OPEN
+      ws.send(payload);
+    }
+  }
+}
+
+function broadcastExcept(excludeId: string, obj: any): void {
+  const payload = JSON.stringify(obj);
+  for (const [id, { ws }] of clients.entries()) {
+    if (id !== excludeId && ws.readyState === 1) {
+      ws.send(payload);
+    }
+  }
+}
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Street Explorer Mobile Server running on http://0.0.0.0:${PORT}`);
+  console.log(`👥 Real-time Multiplayer WebSocket active at ws://0.0.0.0:${PORT}/ws/multiplayer`);
+  console.log(`📦 Ready for Coolify deployment!`);
+});
