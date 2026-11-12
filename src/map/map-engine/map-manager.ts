@@ -99,7 +99,6 @@ export class MapManager {
 
   private setup3DBuildings(): void {
     if (!this.map) return;
-    if (this.map.getLayer('3d-buildings')) return;
 
     try {
       const sourceId = this.map.getSource('openmaptiles') ? 'openmaptiles' : 'osm';
@@ -120,93 +119,30 @@ export class MapManager {
         });
       }
 
-      this.map.addLayer({
-        id: '3d-buildings',
-        source: sourceId,
-        'source-layer': 'building',
-        type: 'fill-extrusion',
-        minzoom: 15,
-        paint: {
-          'fill-extrusion-color': [
-            'case',
-            // If customized via feature-state (Player remodeling)
-            ['boolean', ['feature-state', 'remodeled'], false],
-            ['to-color', ['feature-state', 'color']],
-
-            // Highrises in Bocagrande / Modern towers (> 28m)
-            ['>', ['coalesce', ['get', 'render_height'], ['get', 'height'], 8], 28],
-            '#94a3b8',
-
-            // Vibrant Cartagena Colonial Architectural Palette (Distributed across distinct buildings)
-            [
-              'match',
-              [
-                '%',
-                [
-                  'to-number',
-                  [
-                    'coalesce',
-                    ['id'],
-                    ['get', 'osm_id'],
-                    ['get', 'id'],
-                    ['round', ['*', ['coalesce', ['get', 'render_height'], ['get', 'height'], 7], 19]],
-                    3
-                  ],
-                  0
-                ],
-                7
-              ],
-              0, '#f59e0b', // Amarillo Colonial Cartagena (Plaza & Claustros)
-              1, '#ea580c', // Terracota Cálido
-              2, '#fef08a', // Crema Colonial Pastel
-              3, '#0284c7', // Azul Caribeño
-              4, '#db2777', // Rosa Bougainvillea Colonial
-              5, '#10b981', // Verde Esmeralda Colonial
-              6, '#f8fafc', // Blanco Estuco Encalado
-              '#f59e0b'     // Default cálido
-            ]
-          ],
-          'fill-extrusion-vertical-gradient': true,
-          'fill-extrusion-height': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            15, 0,
-            15.05, ['coalesce', ['get', 'render_height'], ['get', 'height'], 8]
-          ],
-          'fill-extrusion-base': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            15, 0,
-            15.05, ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0]
-          ],
-          'fill-extrusion-opacity': 0.94
-        }
-      });
-
       // GeoJSON source and layer for player-remodeled landmarks
-      this.map.addSource('remodeled-buildings-geojson', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: []
-        }
-      });
+      if (!this.map.getSource('remodeled-buildings-geojson')) {
+        this.map.addSource('remodeled-buildings-geojson', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        });
 
-      this.map.addLayer({
-        id: 'remodeled-buildings-layer',
-        type: 'fill-extrusion',
-        source: 'remodeled-buildings-geojson',
-        minzoom: 13,
-        paint: {
-          'fill-extrusion-color': ['get', 'color'],
-          'fill-extrusion-height': ['get', 'height'],
-          'fill-extrusion-base': 0,
-          'fill-extrusion-vertical-gradient': true,
-          'fill-extrusion-opacity': 0.98
-        }
-      });
+        this.map.addLayer({
+          id: 'remodeled-buildings-layer',
+          type: 'fill-extrusion',
+          source: 'remodeled-buildings-geojson',
+          minzoom: 13,
+          paint: {
+            'fill-extrusion-color': ['get', 'color'],
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 0,
+            'fill-extrusion-vertical-gradient': true,
+            'fill-extrusion-opacity': 0.98
+          }
+        });
+      }
     } catch (e) {
       console.warn('[MapManager] 3D buildings layer notice:', e);
     }

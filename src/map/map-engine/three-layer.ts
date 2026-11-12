@@ -7,6 +7,7 @@ import { AmbientCitizensManager } from '../../citizens/ambient-citizens';
 import type { RemodelManager } from '../../remodel/remodel-manager';
 import { RemodelSignRenderer } from '../../remodel/remodel-sign-renderer';
 import { CartagenaLandmarksManager } from '../../landmarks/cartagena-landmarks-manager';
+import { ColonialDistrictManager } from '../../buildings/colonial-district-manager';
 
 export class ThreeCharacterLayer implements CustomLayerInterface {
   public id: string = 'three-character-layer';
@@ -24,6 +25,7 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   private remodelSignRenderer: RemodelSignRenderer;
   private ambientCitizens: AmbientCitizensManager;
   private landmarksManager: CartagenaLandmarksManager;
+  private colonialDistrict: ColonialDistrictManager;
   private lastTime: number = performance.now();
 
   constructor(characterController: CharacterController) {
@@ -32,6 +34,7 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
     this.scene = new THREE.Scene();
     this.remodelSignRenderer = new RemodelSignRenderer();
     this.landmarksManager = new CartagenaLandmarksManager();
+    this.colonialDistrict = new ColonialDistrictManager();
 
     // Vibrant cartoon lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.6);
@@ -54,6 +57,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     // Initialize iconic Cartagena 3D landmarks (India Catalina, Torre del Reloj, Botero, Chiva Rumbera)
     this.landmarksManager.setScene(this.scene);
+
+    // Initialize full 3D colonial district architecture (casonas, churches, cafes, balconies)
+    this.colonialDistrict.setScene(this.scene);
 
     // Disable frustum culling on all meshes
     this.scene.traverse((obj) => {
@@ -84,6 +90,10 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
   public getLandmarksManager(): CartagenaLandmarksManager {
     return this.landmarksManager;
+  }
+
+  public getColonialDistrict(): ColonialDistrictManager {
+    return this.colonialDistrict;
   }
 
   public onAdd(map: MapLibreMap, gl: WebGLRenderingContext | WebGL2RenderingContext): void {
@@ -161,6 +171,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     // Update 3D iconic Cartagena landmarks (India Catalina, Torre del Reloj, Botero, Chiva)
     this.landmarksManager.updatePositions(lng, lat);
+
+    // Update 3D colonial district architecture (casonas, balconies, cafes)
+    this.colonialDistrict.updatePositions(lng, lat);
 
     this.camera.projectionMatrix = m.multiply(l);
     this.renderer.resetState();
