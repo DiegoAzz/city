@@ -173,6 +173,15 @@ export class Game {
       // Initialize Remodel Modal & Studio for existing architecture (ONLY opens when clicking "🏛️ Remodelar" button)
       this.remodelModal = new RemodelModal(this.remodelManager, this.soundSystem, this.mapManager);
 
+      // Connect real Cartagena 3D landmark proximity notifications
+      const landmarksMgr = this.mapManager.getThreeLayer()?.getLandmarksManager();
+      landmarksMgr?.onLandmarkNearby((landmark) => {
+        if (landmark) {
+          this.soundSystem.playHorn('bicycle');
+          this.hud?.showToast(`${landmark.badgeEmoji} ¡${landmark.name}! ${landmark.description}`, 4500);
+        }
+      });
+
       this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
       this.camera = new CameraController(map, initialLng, initialLat);

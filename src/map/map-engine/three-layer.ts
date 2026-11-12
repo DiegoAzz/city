@@ -6,6 +6,7 @@ import type { DecorationManager } from '../../decorations/decoration-manager';
 import { AmbientCitizensManager } from '../../citizens/ambient-citizens';
 import type { RemodelManager } from '../../remodel/remodel-manager';
 import { RemodelSignRenderer } from '../../remodel/remodel-sign-renderer';
+import { CartagenaLandmarksManager } from '../../landmarks/cartagena-landmarks-manager';
 
 export class ThreeCharacterLayer implements CustomLayerInterface {
   public id: string = 'three-character-layer';
@@ -22,6 +23,7 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   private remodelManager: RemodelManager | null = null;
   private remodelSignRenderer: RemodelSignRenderer;
   private ambientCitizens: AmbientCitizensManager;
+  private landmarksManager: CartagenaLandmarksManager;
   private lastTime: number = performance.now();
 
   constructor(characterController: CharacterController) {
@@ -29,6 +31,7 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
     this.camera = new THREE.Camera();
     this.scene = new THREE.Scene();
     this.remodelSignRenderer = new RemodelSignRenderer();
+    this.landmarksManager = new CartagenaLandmarksManager();
 
     // Vibrant cartoon lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.6);
@@ -48,6 +51,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
     // Initialize ambient Cartagena citizens (Palenquera, Músico, Policía, Turista)
     this.ambientCitizens = new AmbientCitizensManager();
     this.ambientCitizens.setScene(this.scene);
+
+    // Initialize iconic Cartagena 3D landmarks (India Catalina, Torre del Reloj, Botero, Chiva Rumbera)
+    this.landmarksManager.setScene(this.scene);
 
     // Disable frustum culling on all meshes
     this.scene.traverse((obj) => {
@@ -74,6 +80,10 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
     this.remodelManager.onRemodel(() => {
       this.remodelSignRenderer.updateBuildingSigns(this.remodelManager!.getAllRemodeled());
     });
+  }
+
+  public getLandmarksManager(): CartagenaLandmarksManager {
+    return this.landmarksManager;
   }
 
   public onAdd(map: MapLibreMap, gl: WebGLRenderingContext | WebGL2RenderingContext): void {
@@ -148,6 +158,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     // Update 3D remodeled building signs
     this.remodelSignRenderer.updatePositions(lng, lat);
+
+    // Update 3D iconic Cartagena landmarks (India Catalina, Torre del Reloj, Botero, Chiva)
+    this.landmarksManager.updatePositions(lng, lat);
 
     this.camera.projectionMatrix = m.multiply(l);
     this.renderer.resetState();
