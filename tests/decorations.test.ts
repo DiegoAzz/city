@@ -46,7 +46,22 @@ describe('Decoration Manager & 3D Catalog', () => {
     expect(economy.getBalance()).toBe(500 - 150);
   });
 
-  it('rejects decoration placement when player cannot afford it', () => {
+  it('contains houses, modular structures, and furniture in catalog', () => {
+    const colonialHouse = DECORATION_CATALOG.find((d) => d.id === 'house_colonial');
+    expect(colonialHouse).toBeDefined();
+    expect(colonialHouse?.category).toBe('houses');
+    expect(colonialHouse?.rentPerMinute).toBe(45);
+
+    const wall = DECORATION_CATALOG.find((d) => d.id === 'wall_plain');
+    expect(wall).toBeDefined();
+    expect(wall?.category).toBe('structures');
+
+    const sofa = DECORATION_CATALOG.find((d) => d.id === 'furniture_sofa');
+    expect(sofa).toBeDefined();
+    expect(sofa?.category).toBe('furniture');
+  });
+
+  it('demolishes closest placed object and reimburses 80% to player', () => {
     const mockMultiplayer: any = {
       getMyId: () => 'player_test',
       getPlayerName: () => 'Explorador',
@@ -54,11 +69,18 @@ describe('Decoration Manager & 3D Catalog', () => {
     };
 
     const economy = new EconomyManager();
-    economy.setBalance(50); // Less than fountain ($350)
+    economy.setBalance(1000);
 
     const manager = new DecorationManager(economy, mockMultiplayer);
-    const result = manager.placeItem('fountain', -75.5520, 10.4243);
-    expect(result.success).toBe(false);
-    expect(result.reason).toContain('Requiere');
+    // Place a colonial house ($450)
+    const placeRes = manager.placeItem('house_colonial', -75.55196, 10.42431);
+    expect(placeRes.success).toBe(true);
+    expect(economy.getBalance()).toBe(1000 - 450); // 550
+
+    // Demolish from 1 meter away
+    const demoRes = manager.demolishClosestItem(-75.55196, 10.42431, 5.0);
+    expect(demoRes.success).toBe(true);
+    expect(demoRes.refund).toBe(Math.round(450 * 0.8)); // 360
+    expect(economy.getBalance()).toBe(550 + 360); // 910
   });
 });

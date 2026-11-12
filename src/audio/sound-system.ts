@@ -195,6 +195,45 @@ export class SoundSystem {
    * Moto/Car: beep-beep horn
    * Boat: deep maritime foghorn
    */
+  public playBuildSuccess(): void {
+    if (this.isMuted || !this.ctx || this.ctx.state === 'suspended') return;
+    try {
+      const t = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 triumph chime
+      notes.forEach((freq, idx) => {
+        const delay = idx * 0.07;
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t + delay);
+        gain.gain.setValueAtTime(0.35, t + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.22);
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.24);
+      });
+    } catch {}
+  }
+
+  public playDemolish(): void {
+    if (this.isMuted || !this.ctx || this.ctx.state === 'suspended') return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(260, t);
+      osc.frequency.exponentialRampToValueAtTime(110, t + 0.28);
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.30);
+      osc.connect(gain);
+      gain.connect(this.masterGain!);
+      osc.start(t);
+      osc.stop(t + 0.32);
+    } catch {}
+  }
+
   public playHorn(mode: MovementMode): void {
     if (this.isMuted || !this.ctx || this.ctx.state === 'suspended') return;
 

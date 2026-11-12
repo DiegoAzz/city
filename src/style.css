@@ -374,6 +374,154 @@ html, body {
   border-color: rgba(245, 158, 11, 0.6) !important;
 }
 
+/* ==========================================================================
+   CONSTRUCTION & REAL ESTATE BUILD STUDIO FLYOUT
+   ========================================================================== */
+.build-btn-glow {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.45) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35) !important;
+}
+
+.build-studio-flyout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.96) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
+  border-radius: 18px !important;
+  padding: 10px 12px !important;
+  min-width: 330px;
+  max-width: calc(100vw - 120px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: auto !important;
+}
+
+.build-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.build-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.build-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.build-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.build-tab {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.build-tab.active {
+  background: #f59e0b;
+  color: #0f172a;
+  border-color: #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.build-tab.tab-demolish {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  margin-left: auto;
+}
+
+.build-tab.tab-demolish:active {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.build-items-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+
+.build-items-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.build-category-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.build-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, background 0.12s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.build-card:active {
+  transform: scale(0.95);
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+}
+
+.card-emoji {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.card-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.card-price {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #34d399;
+}
+
 .decor-pill {
   border-color: rgba(245, 158, 11, 0.4) !important;
 }

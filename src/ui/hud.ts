@@ -8,6 +8,8 @@ import { GameDialog, DialogOptions } from './dialog/game-dialog';
 import type { DecorationManager } from '../decorations/decoration-manager';
 import { DECORATION_CATALOG } from '../decorations/decoration-manager';
 import type { EconomyManager } from '../economy/economy-manager';
+import type { CollisionSystem } from '../navigation/collision-system';
+import { metersToDeltaDegrees } from '../map/projection/mercator';
 
 export class Hud {
   private btnCamera: HTMLElement | null = null;
@@ -38,7 +40,8 @@ export class Hud {
     private presentationMode: PresentationMode,
     private soundSystem: SoundSystem,
     private decorationManager?: DecorationManager,
-    private economy?: EconomyManager
+    private economy?: EconomyManager,
+    private collisionSystem?: CollisionSystem
   ) {
     this.gameDialog = new GameDialog();
     this.btnCamera = document.getElementById('btn-camera');
@@ -186,8 +189,8 @@ export class Hud {
     const btnMenu = document.getElementById('btn-roblox-menu');
     const flyoutMenu = document.getElementById('flyout-main-menu');
     const btnMenuClose = document.getElementById('btn-menu-close');
-    const btnDecor = document.getElementById('btn-dock-decor');
-    const flyoutDecorations = document.getElementById('flyout-decorations');
+    const btnBuild = document.getElementById('btn-dock-build') || document.getElementById('btn-dock-decor');
+    const flyoutBuild = document.getElementById('flyout-build') || document.getElementById('flyout-decorations');
 
     const toggleFlyout = (el: HTMLElement | null, others: (HTMLElement | null)[]) => {
       if (!el) return;
@@ -200,35 +203,97 @@ export class Hud {
       }
     };
 
-    // Decorate dock button & catalog pills
-    btnDecor?.addEventListener('pointerdown', (e) => e.stopPropagation());
-    btnDecor?.addEventListener('click', (e) => {
+    // Construction dock button
+    btnBuild?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnBuild?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutDecorations, [flyoutVehicles, flyoutCamera, flyoutMenu]);
+      toggleFlyout(flyoutBuild, [flyoutVehicles, flyoutCamera, flyoutMenu]);
     });
 
-    const decorPills = document.querySelectorAll<HTMLButtonElement>('.decor-pill');
-    decorPills.forEach((pill) => {
-      pill.addEventListener('pointerdown', (e) => e.stopPropagation());
-      pill.addEventListener('click', (e) => {
+    // Category Tabs (Casas, Obras, Muebles, Lujo)
+    const buildTabs = document.querySelectorAll<HTMLButtonElement>('.build-tab[data-tab]');
+    const categoryGroups = document.querySelectorAll<HTMLElement>('.build-category-group');
+
+    buildTabs.forEach((tab) => {
+      tab.addEventListener('pointerdown', (e) => e.stopPropagation());
+      tab.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const itemId = pill.getAttribute('data-item');
+        const targetGroup = tab.getAttribute('data-tab');
+        buildTabs.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        categoryGroups.forEach((grp) => {
+          if (grp.getAttribute('data-group') === targetGroup) {
+            grp.classList.remove('hidden');
+          } else {
+            grp.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Demolish Button
+    const btnDemolish = document.getElementById('btn-build-demolish');
+    btnDemolish?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnDemolish?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!this.decorationManager) return;
+      const [pLng, pLat] = this.characterController.getPosition();
+      const res = this.decorationManager.demolishClosestItem(pLng, pLat);
+      if (res.success) {
+        this.soundSystem.playDemolish();
+        this.showToast(`🗑️ ¡${res.item?.name || 'Objeto'} demolido! Se reembolsaron $${res.refund}.`);
+        if (this.economy) {
+          const balanceEl = document.getElementById('player-balance-text');
+          if (balanceEl) balanceEl.textContent = `$${this.economy.getBalance().toLocaleString()}`;
+        }
+        flyoutBuild?.classList.add('hidden');
+      } else {
+        this.showToast(`⚠️ ${res.reason || 'Nada para demoler cerca.'}`);
+      }
+    });
+
+    // Build Cards & Pills
+    const buildCards = document.querySelectorAll<HTMLButtonElement>('.build-card, .decor-pill');
+    buildCards.forEach((card) => {
+      card.addEventListener('pointerdown', (e) => e.stopPropagation());
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const itemId = card.getAttribute('data-item');
         if (!itemId) return;
 
-        const [lng, lat] = this.characterController.getPosition();
+        const [playerLng, playerLat] = this.characterController.getPosition();
+        const facingRad = this.characterController.getFacingAngleRad();
+
+        // Calculate placement position 2.4 meters in front of the avatar
+        const offsetEastMeters = Math.sin(facingRad) * 2.4;
+        const offsetNorthMeters = Math.cos(facingRad) * 2.4;
+        const [dLng, dLat] = metersToDeltaDegrees(offsetEastMeters, offsetNorthMeters, playerLat);
+        const targetLng = playerLng + dLng;
+        const targetLat = playerLat + dLat;
+
+        // Anti-clipping collision check: never build inside OSM map buildings!
+        if (this.collisionSystem?.isBuilding(targetLng, targetLat)) {
+          this.showToast('⚠️ No puedes construir dentro de un edificio existente. Muévete a un espacio abierto.');
+          return;
+        }
+
         if (this.decorationManager) {
-          const res = this.decorationManager.placeItem(itemId, lng, lat);
+          const res = this.decorationManager.placeItem(itemId, targetLng, targetLat, facingRad);
           if (res.success) {
-            this.soundSystem.playHorn('bicycle');
+            this.soundSystem.playBuildSuccess();
             const itemDef = DECORATION_CATALOG.find((d) => d.id === itemId);
-            this.showToast(`✨ ¡${itemDef?.name || 'Objeto'} colocado en la ciudad!`);
+            const rentText = itemDef?.rentPerMinute ? ` (+${itemDef.rentPerMinute}/min)` : '';
+            this.showToast(`🔨 ¡${itemDef?.name || 'Inmueble'} construido con éxito!${rentText}`);
             if (this.economy) {
               const balanceEl = document.getElementById('player-balance-text');
               if (balanceEl) balanceEl.textContent = `$${this.economy.getBalance().toLocaleString()}`;
             }
-            flyoutDecorations?.classList.add('hidden');
+            flyoutBuild?.classList.add('hidden');
           } else {
             this.showToast(`⚠️ ${res.reason || 'Saldo insuficiente'}`);
           }
@@ -241,7 +306,7 @@ export class Hud {
     btnVehicle?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutVehicles, [flyoutCamera, flyoutMenu, flyoutDecorations]);
+      toggleFlyout(flyoutVehicles, [flyoutCamera, flyoutMenu, flyoutBuild]);
     });
 
     // Camera dock button
@@ -249,7 +314,7 @@ export class Hud {
     btnCamera?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutCamera, [flyoutVehicles, flyoutMenu, flyoutDecorations]);
+      toggleFlyout(flyoutCamera, [flyoutVehicles, flyoutMenu, flyoutBuild]);
     });
 
     // Main Roblox Menu (☰)
@@ -257,7 +322,7 @@ export class Hud {
     btnMenu?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutMenu, [flyoutVehicles, flyoutCamera, flyoutDecorations]);
+      toggleFlyout(flyoutMenu, [flyoutVehicles, flyoutCamera, flyoutBuild]);
     });
 
     btnMenuClose?.addEventListener('click', (e) => {
@@ -267,7 +332,7 @@ export class Hud {
     });
 
     // Prevent touches inside flyouts from closing them
-    [flyoutVehicles, flyoutCamera, flyoutMenu, flyoutDecorations].forEach((f) => {
+    [flyoutVehicles, flyoutCamera, flyoutMenu, flyoutBuild].forEach((f) => {
       f?.addEventListener('pointerdown', (e) => e.stopPropagation());
       f?.addEventListener('click', (e) => e.stopPropagation());
     });

@@ -234,31 +234,207 @@
 
       <!-- Roblox Style Right Edge Menu Strip (Collapsible Dock) -->
       <aside class="roblox-dock-right" aria-label="Menú lateral de acciones">
-        <!-- 1. Decorar Button & Flyout (Fase 6: Catálogo 3D en Vivo) -->
+        <!-- 1. Construir Inmuebles & Casas Button & Studio Drawer -->
         <div class="dock-item-wrapper">
-          <button id="btn-dock-decor" class="roblox-dock-btn decor-btn-glow" aria-label="Decorar Ciudad" title="Decorar con Objetos 3D">
-            <span class="dock-icon">🎨</span>
-            <span class="dock-label">Decorar</span>
+          <button id="btn-dock-build" class="roblox-dock-btn build-btn-glow" aria-label="Construir Inmuebles" title="Construir Casas y Muebles">
+            <span class="dock-icon">🔨</span>
+            <span class="dock-label">Construir</span>
           </button>
 
-          <!-- Horizontal Slide-Out Flyout for Decorations -->
-          <div id="flyout-decorations" class="dock-flyout flyout-left hidden">
-            <button class="mode-pill decor-pill" data-item="palm_tree" title="Palmera ($150)">
-              <span class="mode-icon">🌴</span>
-              <span class="mode-text">Palmera</span>
-            </button>
-            <button class="mode-pill decor-pill" data-item="colonial_bench" title="Banco ($100)">
-              <span class="mode-icon">🛋️</span>
-              <span class="mode-text">Banco</span>
-            </button>
-            <button class="mode-pill decor-pill" data-item="street_lamp" title="Farol ($120)">
-              <span class="mode-icon">💡</span>
-              <span class="mode-text">Farol</span>
-            </button>
-            <button class="mode-pill decor-pill" data-item="fountain" title="Fuente ($350)">
-              <span class="mode-icon">⛲</span>
-              <span class="mode-text">Fuente</span>
-            </button>
+          <!-- Expandable Construction & Real Estate Drawer -->
+          <div id="flyout-build" class="dock-flyout build-studio-flyout hidden" aria-label="Estudio de Construcción">
+            <div class="build-header">
+              <span class="build-title">🔨 Obras & Bienes Raíces</span>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="build-tabs">
+              <button class="build-tab active" data-tab="houses">🏠 Casas</button>
+              <button class="build-tab" data-tab="structures">🧱 Obras</button>
+              <button class="build-tab" data-tab="furniture">🛋️ Muebles</button>
+              <button class="build-tab" data-tab="luxury">🏊 Lujo</button>
+              <button id="btn-build-demolish" class="build-tab tab-demolish" title="Demoler objeto cercano con 80% reembolso">🗑️ Demoler</button>
+            </div>
+
+            <!-- Items Grid Container -->
+            <div class="build-items-scroll">
+              <!-- 1. Casas e Inmuebles -->
+              <div class="build-category-group" data-group="houses">
+                <button class="build-card decor-pill" data-item="house_colonial">
+                  <span class="card-emoji">🏠</span>
+                  <div class="card-info">
+                    <span class="card-title">Casa Colonial</span>
+                    <span class="card-price">$450 • +$45/min</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="house_mansion">
+                  <span class="card-emoji">🏰</span>
+                  <div class="card-info">
+                    <span class="card-title">Mansión Moderna</span>
+                    <span class="card-price">$850 • +$90/min</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="house_villa">
+                  <span class="card-emoji">🏡</span>
+                  <div class="card-info">
+                    <span class="card-title">Villa Caribeña</span>
+                    <span class="card-price">$700 • +$70/min</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="shop_cafe">
+                  <span class="card-emoji">☕</span>
+                  <div class="card-info">
+                    <span class="card-title">Café / Terraza</span>
+                    <span class="card-price">$400 • +$50/min</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- 2. Obras / Estructuras Modulares -->
+              <div class="build-category-group hidden" data-group="structures">
+                <button class="build-card decor-pill" data-item="wall_plain">
+                  <span class="card-emoji">🧱</span>
+                  <div class="card-info">
+                    <span class="card-title">Pared Colonial</span>
+                    <span class="card-price">$30</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="wall_window">
+                  <span class="card-emoji">🪟</span>
+                  <div class="card-info">
+                    <span class="card-title">Pared con Ventana</span>
+                    <span class="card-price">$45</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="door_frame">
+                  <span class="card-emoji">🚪</span>
+                  <div class="card-info">
+                    <span class="card-title">Puerta Principal</span>
+                    <span class="card-price">$60</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="floor_tile">
+                  <span class="card-emoji">🟫</span>
+                  <div class="card-info">
+                    <span class="card-title">Piso de Baldosa</span>
+                    <span class="card-price">$25</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="roof_tile">
+                  <span class="card-emoji">🔺</span>
+                  <div class="card-info">
+                    <span class="card-title">Techo Colonial</span>
+                    <span class="card-price">$50</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="column_stone">
+                  <span class="card-emoji">🏛️</span>
+                  <div class="card-info">
+                    <span class="card-title">Columna de Piedra</span>
+                    <span class="card-price">$35</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- 3. Muebles de Interior -->
+              <div class="build-category-group hidden" data-group="furniture">
+                <button class="build-card decor-pill" data-item="furniture_sofa">
+                  <span class="card-emoji">🛋️</span>
+                  <div class="card-info">
+                    <span class="card-title">Sofá Moderno</span>
+                    <span class="card-price">$80</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="furniture_bed">
+                  <span class="card-emoji">🛏️</span>
+                  <div class="card-info">
+                    <span class="card-title">Cama King Size</span>
+                    <span class="card-price">$120</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="furniture_tv">
+                  <span class="card-emoji">📺</span>
+                  <div class="card-info">
+                    <span class="card-title">Smart TV 75"</span>
+                    <span class="card-price">$140</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="furniture_table">
+                  <span class="card-emoji">🪑</span>
+                  <div class="card-info">
+                    <span class="card-title">Mesa y Sillas</span>
+                    <span class="card-price">$70</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="furniture_kitchen">
+                  <span class="card-emoji">🍳</span>
+                  <div class="card-info">
+                    <span class="card-title">Cocina Integral</span>
+                    <span class="card-price">$160</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- 4. Lujo, Exteriores & Jardín -->
+              <div class="build-category-group hidden" data-group="luxury">
+                <button class="build-card decor-pill" data-item="outdoor_pool">
+                  <span class="card-emoji">🏊</span>
+                  <div class="card-info">
+                    <span class="card-title">Piscina Azul</span>
+                    <span class="card-price">$300</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="outdoor_jacuzzi">
+                  <span class="card-emoji">🛁</span>
+                  <div class="card-info">
+                    <span class="card-title">Jacuzzi de Lujo</span>
+                    <span class="card-price">$180</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="palm_tree">
+                  <span class="card-emoji">🌴</span>
+                  <div class="card-info">
+                    <span class="card-title">Palmera Caribeña</span>
+                    <span class="card-price">$150</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="fountain">
+                  <span class="card-emoji">⛲</span>
+                  <div class="card-info">
+                    <span class="card-title">Fuente de Piedra</span>
+                    <span class="card-price">$350</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="colonial_bench">
+                  <span class="card-emoji">🪑</span>
+                  <div class="card-info">
+                    <span class="card-title">Banco Colonial</span>
+                    <span class="card-price">$100</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="street_lamp">
+                  <span class="card-emoji">💡</span>
+                  <div class="card-info">
+                    <span class="card-title">Farol con Luz</span>
+                    <span class="card-price">$120</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="outdoor_fence">
+                  <span class="card-emoji">🪜</span>
+                  <div class="card-info">
+                    <span class="card-title">Cerca de Jardín</span>
+                    <span class="card-price">$20</span>
+                  </div>
+                </button>
+                <button class="build-card decor-pill" data-item="flower_pot">
+                  <span class="card-emoji">🌺</span>
+                  <div class="card-info">
+                    <span class="card-title">Maceta Floral</span>
+                    <span class="card-price">$50</span>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

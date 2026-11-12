@@ -88,6 +88,14 @@ export class CharacterController {
     return [this.lng, this.lat];
   }
 
+  public getBearing(): number {
+    return this.bearingDeg;
+  }
+
+  public getFacingAngleRad(): number {
+    return (this.bearingDeg * Math.PI) / 180.0;
+  }
+
   public setPosition(lng: number, lat: number): void {
     const [cLng, cLat] = clampToCartagenaBounds(lng, lat);
     this.lng = cLng;

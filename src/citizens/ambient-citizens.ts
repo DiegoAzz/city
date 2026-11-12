@@ -90,40 +90,40 @@ export class AmbientCitizensManager {
       name: 'Doña Rosa',
       role: 'Palenquera 🍉',
       color: 0xf59e0b, // Vibrant tropical yellow
-      initialLng: -75.55208,
-      initialLat: 10.42438,
+      initialLng: -75.55196,
+      initialLat: 10.42434,
       greeting: '¡A la orden las frutas frescas! 🥭🍉',
-      patrolRadiusMeters: 4.5
+      patrolRadiusMeters: 2.2
     },
     {
       id: 'musico_chepe',
       name: 'Don Chepe',
       role: 'Juglar 🪗',
       color: 0xef4444, // Festive red
-      initialLng: -75.55192,
-      initialLat: 10.42428,
+      initialLng: -75.55193,
+      initialLat: 10.42429,
       greeting: '¡Bienvenidos a Cartagena! 🪗✨',
-      patrolRadiusMeters: 3.2
+      patrolRadiusMeters: 1.8
     },
     {
       id: 'policia_gomez',
       name: 'Agente Gómez',
       role: 'Policía 👮',
       color: 0x1e293b, // Police navy
-      initialLng: -75.55218,
-      initialLat: 10.42426,
+      initialLng: -75.55198,
+      initialLat: 10.42428,
       greeting: '¡Plaza Santo Domingo segura y en paz! 👮',
-      patrolRadiusMeters: 6.0
+      patrolRadiusMeters: 2.4
     },
     {
       id: 'turista_mateo',
       name: 'Mateo',
       role: 'Turista 📸',
       color: 0x06b6d4, // Cyan
-      initialLng: -75.55184,
-      initialLat: 10.42442,
+      initialLng: -75.55192,
+      initialLat: 10.42433,
       greeting: '¡Qué arquitectura colonial tan hermosa! 📸',
-      patrolRadiusMeters: 5.0
+      patrolRadiusMeters: 2.0
     }
   ];
 

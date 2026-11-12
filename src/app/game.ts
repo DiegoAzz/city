@@ -174,7 +174,8 @@ export class Game {
         this.presentationMode,
         this.soundSystem,
         this.decorationManager,
-        this.economy
+        this.economy,
+        this.collisionSystem
       );
 
       // Announce when another citizen joins the multiplayer room
