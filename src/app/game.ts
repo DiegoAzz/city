@@ -15,6 +15,7 @@ import { SoundSystem } from '../audio/sound-system';
 import { MultiplayerManager } from '../multiplayer/multiplayer-manager';
 import { ChatUi } from '../ui/chat/chat-ui';
 import { OrientationManager } from '../controls/orientation-manager';
+import { IntroManager } from '../ui/intro/intro-manager';
 
 export class Game {
   private character: CharacterController;
@@ -25,6 +26,7 @@ export class Game {
   private perfMonitor: PerfMonitor;
   private presentationMode: PresentationMode;
   private orientationManager: OrientationManager;
+  private intro: IntroManager;
   private hud: Hud | null = null;
   private collisionSystem: CollisionSystem | null = null;
   private touchOrbit: TouchOrbitController | null = null;
@@ -74,21 +76,36 @@ export class Game {
       }
     });
 
-    // 5. Initialize Map
+    // 5. Initialize Intro & Onboarding Manager (Fase 3: Brookhaven-inspired welcome)
+    this.intro = new IntroManager(
+      this.qualityManager,
+      this.soundSystem,
+      this.multiplayer,
+      {
+        onPlay: () => {
+          this.handlePlay();
+        }
+      }
+    );
+    this.intro.setProgress(20, 'Cargando calles y manzanas de OpenStreetMap...');
+
+    // 6. Initialize Map
     const initialDpr = this.qualityManager.getProfile().dpr;
     this.mapManager = new MapManager('map-container', this.character, initialDpr);
 
-    // 6. Setup Floating Invisible Joystick
+    // 7. Setup Floating Invisible Joystick
     const touchZone = document.getElementById('touch-zone-left') || document.getElementById('joystick-zone');
     const feedbackEl = document.getElementById('joystick-feedback');
     if (touchZone) {
       this.joystick = new VirtualJoystick(touchZone, feedbackEl);
     }
 
-    // 7. When Map is ready, connect Camera, Collision, and HUD
+    // 8. When Map is ready, connect Camera, Collision, and HUD
     this.mapManager.onReady(() => {
       const map = this.mapManager.getMap();
       if (!map) return;
+
+      this.intro.setProgress(55, 'Generando arquitectura 3D de Cartagena...');
 
       // Initialize real-time street and building collision system
       this.collisionSystem = new CollisionSystem();
@@ -109,10 +126,15 @@ export class Game {
       // Connect multiplayer manager to Three.js custom layer
       this.mapManager.getThreeLayer()?.setMultiplayerManager(this.multiplayer);
 
+      this.intro.setProgress(80, 'Configurando física y perspectiva cinematográfica...');
+
       this.camera = new CameraController(map, initialLng, initialLat);
       if (prefs.cameraMode) {
         this.camera.setMode(prefs.cameraMode);
       }
+
+      // Start panoramic cinematic orbit during welcome screen
+      this.camera.startCinematic();
 
       // Initialize touch gesture orbit & pinch zoom controller
       this.touchOrbit = new TouchOrbitController(this.camera, 'map-container');
@@ -139,9 +161,12 @@ export class Game {
 
       // Apply initial 3D building setting
       this.mapManager.set3DBuildingsVisible(this.qualityManager.getProfile().enable3DBuildings);
+
+      // Complete intro loading sequence
+      this.intro.setProgress(100, '¡Todo listo! Bienvenido a CITY WORLD');
     });
 
-    // 7. Handle visibility changes (battery saving when tab is backgrounded)
+    // 9. Handle visibility changes (battery saving when tab is backgrounded)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.stop();
@@ -150,13 +175,25 @@ export class Game {
       }
     });
 
-    // 8. Save preferences on unload
+    // 10. Save preferences on unload
     window.addEventListener('beforeunload', () => {
       this.saveCurrentState();
     });
 
     // Start game loop immediately
     this.start();
+  }
+
+  private handlePlay(): void {
+    if (this.camera) {
+      this.camera.stopCinematic();
+    }
+    this.soundSystem.playHorn('bicycle');
+    this.hud?.showToast('🏙️ ¡Bienvenido a Cartagena de Indias! Explora libremente.');
+  }
+
+  public getIntro(): IntroManager {
+    return this.intro;
   }
 
   public getHud(): Hud | null {
@@ -223,6 +260,14 @@ export class Game {
       return;
     }
 
+    // 0. Handle Welcome / Cinematic Mode: orbit camera around Cartagena
+    if (this.intro.getState() !== 'playing') {
+      if (this.camera?.getIsCinematic()) {
+        this.camera.updateCinematic(deltaSeconds);
+      }
+      return;
+    }
+
     // 1. Get Joystick Input
     const joystickVec = this.joystick ? this.joystick.getVector() : { x: 0, y: 0 };
     const cameraBearing = this.camera ? this.camera.getBearing() : CARTAGENA_CONFIG.initialBearing;
@@ -261,7 +306,7 @@ export class Game {
       currentProfile.targetFps
     );
 
-    // 5. Periodic auto-save (every 5 seconds)
+    // 8. Periodic auto-save (every 5 seconds)
     if (currentTime - this.lastSaveTime >= 5000) {
       this.saveCurrentState();
       this.lastSaveTime = currentTime;

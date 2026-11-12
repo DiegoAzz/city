@@ -10,6 +10,8 @@ export class CameraController {
   private targetLat: number;
   private currentLng: number;
   private currentLat: number;
+  private isCinematic: boolean = false;
+  private cinematicAngle: number = 30;
 
   constructor(map: MapLibreMap, initialLng: number, initialLat: number) {
     this.map = map;
@@ -17,6 +19,31 @@ export class CameraController {
     this.targetLat = initialLat;
     this.currentLng = initialLng;
     this.currentLat = initialLat;
+  }
+
+  public startCinematic(): void {
+    this.isCinematic = true;
+    this.cinematicAngle = this.map.getBearing() || 30;
+    this.map.easeTo({
+      pitch: 58,
+      zoom: 17.5,
+      duration: 800
+    });
+  }
+
+  public stopCinematic(): void {
+    this.isCinematic = false;
+    this.applyModeSettings();
+  }
+
+  public updateCinematic(deltaSeconds: number): void {
+    if (!this.isCinematic) return;
+    this.cinematicAngle = (this.cinematicAngle + deltaSeconds * 5.0) % 360;
+    this.map.setBearing(this.cinematicAngle);
+  }
+
+  public getIsCinematic(): boolean {
+    return this.isCinematic;
   }
 
   public getMode(): CameraViewMode {
