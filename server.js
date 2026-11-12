@@ -29,6 +29,7 @@ app.use((_req, res) => {
 
 // Multiplayer WebSocket Server
 const clients = new Map();
+const persistentProperties = new Map();
 
 server.on('upgrade', (request, socket, head) => {
   const url = new URL(request.url || '', `http://${request.headers.host}`);
@@ -63,6 +64,14 @@ wss.on('connection', (ws) => {
           count: clients.size
         }));
 
+        // Send existing claimed properties in this world instance
+        if (persistentProperties.size > 0) {
+          ws.send(JSON.stringify({
+            type: 'properties-state',
+            properties: Array.from(persistentProperties.values())
+          }));
+        }
+
         // Broadcast new player joined to all peers
         broadcastExcept(clientId, {
           type: 'player-joined',
@@ -93,6 +102,14 @@ wss.on('connection', (ws) => {
               timestamp: Date.now()
             });
           }
+        }
+      } else if (msg.type === 'update-property') {
+        if (msg.property && msg.property.id) {
+          persistentProperties.set(msg.property.id, msg.property);
+          broadcast({
+            type: 'property-updated',
+            property: msg.property
+          });
         }
       }
     } catch (e) {

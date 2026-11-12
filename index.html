@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0f172a">
-  <title>CITY WORLD — Mundo Abierto Social con Ciudades Reales</title>
+  <meta name="theme-color" content="#020617">
+  <title>THE FANTASTIC ONE — Videojuego de Mundo Abierto</title>
   <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
       </div>
       <h2 class="orientation-title">GIRA TU DISPOSITIVO</h2>
       <p class="orientation-desc">
-        <strong>CITY WORLD</strong> está diseñado para jugarse en formato <strong>horizontal (Landscape)</strong>. Rota tu pantalla para explorar.
+        <strong>THE FANTASTIC ONE</strong> está diseñado para jugarse en formato <strong>horizontal (Landscape)</strong>. Rota tu pantalla para explorar.
       </p>
       <button id="btn-request-fullscreen" class="btn-fullscreen-rotate" type="button">
         <span class="btn-icon">🎮</span>
@@ -29,70 +29,72 @@
   </aside>
 
   <div id="app">
-    <!-- Map Container (OpenStreetMap 3D City Engine) -->
+    <!-- Map Container (3D City Engine) -->
     <div id="map-container"></div>
 
-    <!-- 1. LOADING SCREEN (Fase 3: Pantalla de carga profesional) -->
+    <!-- 1. LOADING SCREEN (Con imagen de fondo espectacular y capa fade negro) -->
     <section id="loading-screen" class="intro-screen loading-screen" aria-label="Pantalla de carga">
+      <div class="loading-overlay-fade"></div>
       <div class="loading-content">
         <div class="loading-brand">
-          <div class="brand-badge-pill">🏙️ OPENSTREETMAP 3D ENGINE</div>
-          <h1 class="brand-title">CITY WORLD</h1>
-          <p class="brand-subtitle">Mundo Abierto Social · Cartagena de Indias 1:1</p>
+          <div class="brand-badge-pill">🎮 VIDEOJUEGO DE MUNDO ABIERTO 3D</div>
+          <h1 class="brand-title">THE FANTASTIC ONE</h1>
+          <p class="brand-subtitle">Mundo Abierto Social · Cartagena de Indias</p>
         </div>
 
         <div class="loading-box">
           <div class="loading-progress-track">
-            <div id="loading-progress-fill" class="loading-progress-fill" style="width: 15%"></div>
+            <div id="loading-progress-fill" class="loading-progress-fill" style="width: 20%"></div>
           </div>
           <div class="loading-meta">
-            <span id="loading-status-text" class="loading-status-text">Cargando calles y manzanas de OpenStreetMap...</span>
-            <span id="loading-percent-text" class="loading-percent-text">15%</span>
+            <span id="loading-status-text" class="loading-status-text">Cargando avenidas y arquitectura de la ciudad...</span>
+            <span id="loading-percent-text" class="loading-percent-text">20%</span>
           </div>
         </div>
 
         <div class="loading-footer-hint">
-          <span>Inspirado en Brookhaven RP · Ciudades del mundo real a escala exacta</span>
+          <span>Vive tu propia historia, adquiere mansiones y recorre la ciudad con amigos</span>
         </div>
       </div>
     </section>
 
-    <!-- 2. WELCOME & ROLEPLAY SCREEN (Fase 3: Pantalla de bienvenida cinematográfica) -->
+    <!-- 2. WELCOME & ROLEPLAY SCREEN (Con fondo panorámico y capa fade negro) -->
     <section id="welcome-screen" class="intro-screen welcome-screen hidden" aria-label="Pantalla de bienvenida">
+      <div class="welcome-overlay-fade"></div>
       <div class="welcome-container">
-        <!-- Columna Izquierda: Novedades & Brookhaven Features -->
+        <!-- Columna Izquierda: Novedades del Juego -->
         <aside class="welcome-col welcome-news" aria-label="Novedades del juego">
           <div class="panel-header">
             <span class="panel-icon">🌟</span>
-            <h2 class="panel-title">NOVEDADES CITY WORLD</h2>
+            <h2 class="panel-title">NOVEDADES DEL JUEGO</h2>
           </div>
           <div class="news-list">
             <div class="news-item">
               <span class="news-bullet">🏙️</span>
               <div class="news-text">
-                <strong>Cartagena Real (OSM)</strong>
-                <p>Explora calles auténticas, murallas históricas y plazas reales a escala 1:1.</p>
+                <strong>Gran Ciudad Abierta</strong>
+                <p>Explora calles auténticas, rascacielos iluminados, murallas y plazas históricas.</p>
               </div>
             </div>
             <div class="news-item">
               <span class="news-bullet">🏡</span>
               <div class="news-text">
-                <strong>Casas & Propiedades</strong>
-                <p>Adquiere y decora edificios en el mundo gris evolutivo persistente.</p>
+                <strong>Casas & Mansiones Propias</strong>
+                <p>Adquiere edificios exclusivos, personaliza su fachada y decóralos a tu gusto.</p>
               </div>
             </div>
             <div class="news-item">
               <span class="news-bullet">🚗</span>
               <div class="news-text">
                 <strong>Garaje de Vehículos</strong>
-                <p>Conduce bicicletas, motos Vespa, micro carros y lanchas marítimas.</p>
+                <p>Conduce bicicletas, motos deportivas, micro carros y lanchas marítimas.</p>
               </div>
             </div>
             <div class="news-item">
               <span class="news-bullet">👥</span>
               <div class="news-text">
-                <strong>Mundo Social Multijugador</strong>
-                <p>Chatea en vivo, visita casas y rolea con otros jugadores en la ciudad.</p>
+                <strong>Comunidad Multijugador</strong>
+                <p>Chatea en vivo, visita propiedades y juega tu historia con otros ciudadanos.</p>
               </div>
             </div>
           </div>
@@ -101,9 +103,9 @@
         <!-- Columna Central: Hero, Logo y Gran Botón JUGAR -->
         <main class="welcome-col welcome-hero" aria-label="Acceso al juego">
           <div class="hero-brand">
-            <span class="hero-location-chip">📍 CARTAGENA DE INDIAS · COLOMBIA</span>
-            <h1 class="hero-title">CITY WORLD</h1>
-            <p class="hero-tagline">Construye tu vida en una ciudad real</p>
+            <span class="hero-location-chip">📍 CARTAGENA DE INDIAS</span>
+            <h1 class="hero-title">THE FANTASTIC ONE</h1>
+            <p class="hero-tagline">Construye tu vida y tu imperio en un mundo abierto</p>
           </div>
 
           <div class="hero-action">
@@ -116,11 +118,11 @@
           </div>
         </main>
 
-        <!-- Columna Derecha: Ciudadano / Customizer / Roles Brookhaven -->
+        <!-- Columna Derecha: Ciudadano / Customizer / Roles Sociales -->
         <aside class="welcome-col welcome-customizer" aria-label="Configuración de personaje">
           <div class="panel-header">
             <span class="panel-icon">👤</span>
-            <h2 class="panel-title">TU CIUDADANO (ROLEPLAY)</h2>
+            <h2 class="panel-title">TU PERSONAJE (ROL SOCIAL)</h2>
           </div>
 
           <div class="customizer-group">
@@ -136,7 +138,7 @@
           </div>
 
           <div class="customizer-group">
-            <span class="customizer-label">Rol / Identidad Brookhaven:</span>
+            <span class="customizer-label">Profesión / Identidad:</span>
             <div class="role-chips-grid">
               <button type="button" class="role-chip active" data-role="tourist">
                 <span class="chip-emoji">🌴</span>
@@ -166,15 +168,15 @@
           </div>
 
           <div class="customizer-group">
-            <span class="customizer-label">Color de Sudadera:</span>
+            <span class="customizer-label">Color de Ropa:</span>
             <div class="color-chips-row">
               <button type="button" class="color-chip active" data-color="#0284c7" style="background-color: #0284c7" title="Azul Océano"></button>
               <button type="button" class="color-chip" data-color="#ef4444" style="background-color: #ef4444" title="Rojo Pasión"></button>
               <button type="button" class="color-chip" data-color="#10b981" style="background-color: #10b981" title="Verde Esmeralda"></button>
-              <button type="button" class="color-chip" data-color="#f59e0b" style="background-color: #f59e0b" title="Ámbar Colonial"></button>
-              <button type="button" class="color-chip" data-color="#8b5cf6" style="background-color: #8b5cf6" title="Púrpura Neón"></button>
-              <button type="button" class="color-chip" data-color="#ec4899" style="background-color: #ec4899" title="Rosa Vibrante"></button>
-              <button type="button" class="color-chip" data-color="#1e293b" style="background-color: #1e293b" title="Negro Noche"></button>
+              <button type="button" class="color-chip" data-color="#f59e0b" style="background-color: #f59e0b" title="Ámbar"></button>
+              <button type="button" class="color-chip" data-color="#8b5cf6" style="background-color: #8b5cf6" title="Púrpura"></button>
+              <button type="button" class="color-chip" data-color="#ec4899" style="background-color: #ec4899" title="Rosa"></button>
+              <button type="button" class="color-chip" data-color="#1e293b" style="background-color: #1e293b" title="Negro"></button>
             </div>
           </div>
 
@@ -194,11 +196,11 @@
 
     <!-- 3. IN-GAME HUD OVERLAY (Initially hidden until user presses JUGAR) -->
     <div id="hud-container" class="hidden">
-      <!-- Top Bar: Brookhaven Style -->
+      <!-- Top Bar -->
       <header class="hud-top">
         <div class="hud-top-left">
-          <!-- Roleplay Badge (Brookhaven Identity) -->
-          <button id="player-role-badge" class="hud-chip role-badge" aria-label="Rol actual" title="Tu Rol en CITY WORLD">
+          <!-- Roleplay Badge -->
+          <button id="player-role-badge" class="hud-chip role-badge" aria-label="Rol actual" title="Tu Identidad en THE FANTASTIC ONE">
             <span class="role-emoji">🌴</span>
             <span class="role-name">Turista</span>
           </button>
@@ -206,7 +208,7 @@
           <!-- City Indicator -->
           <div class="hud-chip location-badge" title="Toca para alternar telemetría">
             <span class="location-dot"></span>
-            <span class="location-name">Cartagena (OSM)</span>
+            <span class="location-name">Cartagena</span>
           </div>
 
           <!-- Multiplayer & Live Chat -->
@@ -219,7 +221,7 @@
         </div>
 
         <div class="hud-top-actions">
-          <!-- Virtual Economy Balance (PRD Section 7) -->
+          <!-- Virtual Economy Balance -->
           <div class="hud-chip economy-chip" title="Saldo virtual para adquirir y decorar propiedades">
             <span class="coin-icon">💰</span>
             <span id="player-balance-text" class="coin-value">$1,000</span>
@@ -267,7 +269,7 @@
       <!-- Notification Toast -->
       <div id="toast" class="toast hidden"></div>
 
-      <!-- Brookhaven Side Action Dock (Left Side): Mobility / Garage / Properties -->
+      <!-- Mobility / Garage Side Dock (Left Side) -->
       <aside class="gamer-dock-left" aria-label="Selector de Movilidad y Garaje">
         <button class="mode-pill active" data-mode="foot" aria-label="A pie" title="Explorador a pie">
           <span class="mode-icon">🚶</span>
@@ -320,9 +322,9 @@
         </div>
       </footer>
 
-      <!-- Map Attribution Footer (OpenStreetMap & MapLibre) -->
+      <!-- Game Footer -->
       <div class="map-attribution-bar">
-        <span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors | CITY WORLD Open Source Engine</span>
+        <span>THE FANTASTIC ONE · Videojuego de Mundo Abierto</span>
       </div>
     </div>
 

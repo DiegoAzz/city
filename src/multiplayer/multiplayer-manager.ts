@@ -19,6 +19,8 @@ export class MultiplayerManager {
   private onPlayerCountCallbacks: Array<(count: number) => void> = [];
   private onChatMessageCallbacks: Array<(msg: ChatMessage) => void> = [];
   private onPlayerJoinedCallbacks: Array<(name: string) => void> = [];
+  private onPropertyUpdatedCallbacks: Array<(prop: any) => void> = [];
+  private onPropertiesStateCallbacks: Array<(props: any[]) => void> = [];
 
   constructor(characterController: CharacterController) {
     this.characterController = characterController;
@@ -40,6 +42,26 @@ export class MultiplayerManager {
 
   public setScene(scene: THREE.Scene): void {
     this.scene = scene;
+  }
+
+  public getMyId(): string {
+    return this.localPlayerId;
+  }
+
+  public onPropertyUpdated(cb: (prop: any) => void): void {
+    this.onPropertyUpdatedCallbacks.push(cb);
+  }
+
+  public onPropertiesState(cb: (props: any[]) => void): void {
+    this.onPropertiesStateCallbacks.push(cb);
+  }
+
+  public broadcastPropertyUpdate(property: any): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    this.ws.send(JSON.stringify({
+      type: 'update-property',
+      property
+    }));
   }
 
   public getPlayerName(): string {
@@ -147,6 +169,18 @@ export class MultiplayerManager {
         // If message is from a remote player, show 3D speech bubble above their avatar!
         if (msg.id && this.remotePlayers.has(msg.id)) {
           this.remotePlayers.get(msg.id)!.showChatBubble(msg.text);
+        }
+        break;
+
+      case 'property-updated':
+        if (msg.property) {
+          this.onPropertyUpdatedCallbacks.forEach((cb) => cb(msg.property));
+        }
+        break;
+
+      case 'properties-state':
+        if (Array.isArray(msg.properties)) {
+          this.onPropertiesStateCallbacks.forEach((cb) => cb(msg.properties));
         }
         break;
     }

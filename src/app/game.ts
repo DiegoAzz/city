@@ -16,6 +16,9 @@ import { MultiplayerManager } from '../multiplayer/multiplayer-manager';
 import { ChatUi } from '../ui/chat/chat-ui';
 import { OrientationManager } from '../controls/orientation-manager';
 import { IntroManager } from '../ui/intro/intro-manager';
+import { EconomyManager } from '../economy/economy-manager';
+import { PropertyManager } from '../properties/property-manager';
+import { PropertyModal } from '../ui/properties/property-modal';
 
 export class Game {
   private character: CharacterController;
@@ -33,6 +36,9 @@ export class Game {
   private soundSystem: SoundSystem;
   private multiplayer: MultiplayerManager;
   private chatUi: ChatUi | null = null;
+  private economy: EconomyManager;
+  private propertyManager: PropertyManager;
+  private propertyModal: PropertyModal | null = null;
 
   private isRunning: boolean = false;
   private lastFrameTime: number = performance.now();
@@ -40,6 +46,11 @@ export class Game {
   private animationFrameId: number | null = null;
 
   constructor() {
+    // Expose game instance for UI components
+    if (typeof window !== 'undefined') {
+      (window as any)._gameInstance = this;
+    }
+
     // 1. Load preferences
     const prefs = LocalStore.load();
 
@@ -63,10 +74,23 @@ export class Game {
     this.presentationMode = new PresentationMode();
     this.presentationMode.setStreamMode(false); // Always guarantee HUD and controls are visible
 
-    // Initialize Audio & Multiplayer systems
+    // Initialize Audio, Multiplayer & Economy systems
     this.soundSystem = new SoundSystem();
     this.multiplayer = new MultiplayerManager(this.character);
     this.chatUi = new ChatUi(this.multiplayer);
+    this.economy = new EconomyManager();
+    this.propertyManager = new PropertyManager(this.economy, this.multiplayer);
+    this.propertyModal = new PropertyModal(this.propertyManager, this.soundSystem);
+
+    // Listen for multiplayer property synchronization
+    this.multiplayer.onPropertyUpdated((prop) => {
+      this.propertyManager.handleRemotePropertyUpdate(prop);
+      this.hud?.showToast(`🏡 ¡${prop.ownerName} personalizó ${prop.name}!`, 3500);
+    });
+
+    this.multiplayer.onPropertiesState((props) => {
+      props.forEach((p) => this.propertyManager.handleRemotePropertyUpdate(p));
+    });
 
     // 4. Initialize Orientation & Landscape Enforcement
     this.orientationManager = new OrientationManager();
@@ -76,7 +100,7 @@ export class Game {
       }
     });
 
-    // 5. Initialize Intro & Onboarding Manager (Fase 3: Brookhaven-inspired welcome)
+    // 5. Initialize Intro & Onboarding Manager
     this.intro = new IntroManager(
       this.qualityManager,
       this.soundSystem,
@@ -87,7 +111,7 @@ export class Game {
         }
       }
     );
-    this.intro.setProgress(20, 'Cargando calles y manzanas de OpenStreetMap...');
+    this.intro.setProgress(20, 'Cargando avenidas y arquitectura de la ciudad...');
 
     // 6. Initialize Map
     const initialDpr = this.qualityManager.getProfile().dpr;
@@ -105,7 +129,7 @@ export class Game {
       const map = this.mapManager.getMap();
       if (!map) return;
 
-      this.intro.setProgress(55, 'Generando arquitectura 3D de Cartagena...');
+      this.intro.setProgress(55, 'Generando mundo 3D y entorno urbano...');
 
       // Initialize real-time street and building collision system
       this.collisionSystem = new CollisionSystem();
@@ -126,7 +150,7 @@ export class Game {
       // Connect multiplayer manager to Three.js custom layer
       this.mapManager.getThreeLayer()?.setMultiplayerManager(this.multiplayer);
 
-      this.intro.setProgress(80, 'Configurando física y perspectiva cinematográfica...');
+      this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
       this.camera = new CameraController(map, initialLng, initialLat);
       if (prefs.cameraMode) {
@@ -149,7 +173,7 @@ export class Game {
 
       // Announce when another citizen joins the multiplayer room
       this.multiplayer.onPlayerJoined((name) => {
-        this.hud?.showToast(`👋 ¡${name} se ha conectado a Cartagena!`, 3200);
+        this.hud?.showToast(`👋 ¡${name} se ha conectado a la ciudad!`, 3200);
       });
 
       // Connect quality updates to MapLibre
@@ -163,7 +187,7 @@ export class Game {
       this.mapManager.set3DBuildingsVisible(this.qualityManager.getProfile().enable3DBuildings);
 
       // Complete intro loading sequence
-      this.intro.setProgress(100, '¡Todo listo! Bienvenido a CITY WORLD');
+      this.intro.setProgress(100, '¡Todo listo! Bienvenido a THE FANTASTIC ONE');
     });
 
     // 9. Handle visibility changes (battery saving when tab is backgrounded)
@@ -189,7 +213,7 @@ export class Game {
       this.camera.stopCinematic();
     }
     this.soundSystem.playHorn('bicycle');
-    this.hud?.showToast('🏙️ ¡Bienvenido a Cartagena de Indias! Explora libremente.');
+    this.hud?.showToast('🏙️ ¡Bienvenido a THE FANTASTIC ONE! Explora libremente.');
   }
 
   public getIntro(): IntroManager {
@@ -198,6 +222,18 @@ export class Game {
 
   public getHud(): Hud | null {
     return this.hud;
+  }
+
+  public getEconomy(): EconomyManager {
+    return this.economy;
+  }
+
+  public getPropertyManager(): PropertyManager {
+    return this.propertyManager;
+  }
+
+  public getPropertyModal(): PropertyModal | null {
+    return this.propertyModal;
   }
 
   public getTouchOrbit(): TouchOrbitController | null {
@@ -260,7 +296,7 @@ export class Game {
       return;
     }
 
-    // 0. Handle Welcome / Cinematic Mode: orbit camera around Cartagena
+    // 0. Handle Welcome / Cinematic Mode: orbit camera around the city center
     if (this.intro.getState() !== 'playing') {
       if (this.camera?.getIsCinematic()) {
         this.camera.updateCinematic(deltaSeconds);
@@ -286,17 +322,20 @@ export class Game {
     // 4. Update Multiplayer & Chat synchronization
     this.multiplayer.update(deltaSeconds);
 
-    // 5. Update Water Proximity & Boat Availability
+    // 5. Update Real-time Property Proximity (Fase 4 & 5)
+    this.propertyManager.updateProximity(currentLng, currentLat);
+
+    // 6. Update Water Proximity & Boat Availability
     if (this.collisionSystem && this.hud) {
       const nearWater = this.collisionSystem.isNearWater(currentLng, currentLat, 18);
       this.hud.updateWaterProximity(nearWater, charState.movementMode);
     }
 
-    // 6. Update Vehicle Engine Sound Dynamics
+    // 7. Update Vehicle Engine Sound Dynamics
     const maxSpeed = SPEED_PRESETS[charState.movementMode].base;
     this.soundSystem.updateEngine(charState.movementMode, charState.speedMps / maxSpeed);
 
-    // 7. Update Performance Telemetry
+    // 8. Update Performance Telemetry
     this.perfMonitor.recordFrame(currentTime, deltaMs);
     const currentProfile = this.qualityManager.getProfile();
     this.perfMonitor.updateTelemetry(
@@ -306,7 +345,7 @@ export class Game {
       currentProfile.targetFps
     );
 
-    // 8. Periodic auto-save (every 5 seconds)
+    // 9. Periodic auto-save (every 5 seconds)
     if (currentTime - this.lastSaveTime >= 5000) {
       this.saveCurrentState();
       this.lastSaveTime = currentTime;
