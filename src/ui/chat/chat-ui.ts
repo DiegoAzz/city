@@ -20,8 +20,8 @@ export class ChatUi {
     this.container = document.createElement('div');
     this.container.className = 'chat-system';
     this.container.innerHTML = `
-      <!-- Floating Chat Toggle Pill (Mobile fallback) -->
-      <button id="btn-chat-toggle" class="chat-toggle-pill" aria-label="Abrir Multijugador y Chat">
+      <!-- Floating Chat Toggle Pill (Hidden, top-bar multiplayer badge handles opening) -->
+      <button id="btn-chat-toggle" class="chat-toggle-pill hidden" style="display: none;" aria-label="Abrir Multijugador y Chat">
         <span class="chat-icon">👥</span>
         <span class="chat-label">Multijugador</span>
         <span id="chat-unread-badge" class="chat-unread hidden">0</span>

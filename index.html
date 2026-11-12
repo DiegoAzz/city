@@ -6,10 +6,28 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
-  <title>Street Explorer Mobile</title>
+  <title>CITY WORLD — Open World City Sandbox</title>
   <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
+  <!-- Mandatory Landscape Orientation Guard (Blocks gameplay in portrait) -->
+  <aside id="orientation-guard" class="orientation-guard hidden" role="alert" aria-live="assertive">
+    <div class="orientation-card">
+      <div class="rotate-device-anim">
+        <span class="rotate-phone">📱</span>
+        <span class="rotate-arrow">🔄</span>
+      </div>
+      <h2 class="orientation-title">GIRA TU DISPOSITIVO</h2>
+      <p class="orientation-desc">
+        <strong>CITY WORLD</strong> está diseñado para jugarse en formato <strong>horizontal (Landscape)</strong>. Rota tu pantalla para explorar.
+      </p>
+      <button id="btn-request-fullscreen" class="btn-fullscreen-rotate" type="button">
+        <span class="btn-icon">🎮</span>
+        <span>Activar Pantalla Completa</span>
+      </button>
+    </div>
+  </aside>
+
   <div id="app">
     <!-- Map Container -->
     <div id="map-container"></div>
@@ -98,11 +116,10 @@
 
       <!-- Bottom Touch Controls Area -->
       <footer class="hud-bottom">
-        <!-- Left: Virtual Joystick Zone -->
-        <div id="joystick-zone" class="joystick-zone">
-          <div id="joystick-base" class="joystick-base">
-            <div id="joystick-stick" class="joystick-stick"></div>
-          </div>
+        <!-- Left: Invisible Floating Joystick Touch Zone -->
+        <div id="touch-zone-left" class="touch-zone-left" aria-label="Zona táctil de movimiento invisible">
+          <!-- Dynamic faint feedback ring (appears only under thumb during touch) -->
+          <div id="joystick-feedback" class="joystick-feedback-ring hidden"></div>
         </div>
 
         <!-- Right Gamer Action Cluster: Vertical Side Stack -->

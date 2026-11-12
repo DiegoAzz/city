@@ -14,6 +14,7 @@ import { TouchOrbitController } from '../camera/touch-orbit';
 import { SoundSystem } from '../audio/sound-system';
 import { MultiplayerManager } from '../multiplayer/multiplayer-manager';
 import { ChatUi } from '../ui/chat/chat-ui';
+import { OrientationManager } from '../controls/orientation-manager';
 
 export class Game {
   private character: CharacterController;
@@ -23,6 +24,7 @@ export class Game {
   private qualityManager: QualityManager;
   private perfMonitor: PerfMonitor;
   private presentationMode: PresentationMode;
+  private orientationManager: OrientationManager;
   private hud: Hud | null = null;
   private collisionSystem: CollisionSystem | null = null;
   private touchOrbit: TouchOrbitController | null = null;
@@ -64,18 +66,26 @@ export class Game {
     this.multiplayer = new MultiplayerManager(this.character);
     this.chatUi = new ChatUi(this.multiplayer);
 
-    // 4. Initialize Map
+    // 4. Initialize Orientation & Landscape Enforcement
+    this.orientationManager = new OrientationManager();
+    this.orientationManager.onOrientationChange((isLandscape) => {
+      if (isLandscape && this.mapManager) {
+        setTimeout(() => this.mapManager.getMap()?.resize(), 120);
+      }
+    });
+
+    // 5. Initialize Map
     const initialDpr = this.qualityManager.getProfile().dpr;
     this.mapManager = new MapManager('map-container', this.character, initialDpr);
 
-    // 5. Setup Joystick
-    const joystickBase = document.getElementById('joystick-base');
-    const joystickStick = document.getElementById('joystick-stick');
-    if (joystickBase && joystickStick) {
-      this.joystick = new VirtualJoystick(joystickBase, joystickStick);
+    // 6. Setup Floating Invisible Joystick
+    const touchZone = document.getElementById('touch-zone-left') || document.getElementById('joystick-zone');
+    const feedbackEl = document.getElementById('joystick-feedback');
+    if (touchZone) {
+      this.joystick = new VirtualJoystick(touchZone, feedbackEl);
     }
 
-    // 6. When Map is ready, connect Camera, Collision, and HUD
+    // 7. When Map is ready, connect Camera, Collision, and HUD
     this.mapManager.onReady(() => {
       const map = this.mapManager.getMap();
       if (!map) return;
@@ -173,6 +183,10 @@ export class Game {
     return this.soundSystem;
   }
 
+  public getOrientationManager(): OrientationManager {
+    return this.orientationManager;
+  }
+
   public start(): void {
     if (this.isRunning) return;
     this.isRunning = true;
@@ -203,6 +217,11 @@ export class Game {
 
     this.lastFrameTime = currentTime;
     const deltaSeconds = Math.min(deltaMs / 1000, 0.1);
+
+    // Pause physics and gameplay while device is in portrait orientation
+    if (!this.orientationManager.getIsLandscape()) {
+      return;
+    }
 
     // 1. Get Joystick Input
     const joystickVec = this.joystick ? this.joystick.getVector() : { x: 0, y: 0 };

@@ -45,15 +45,21 @@ export class TouchOrbitController {
   }
 
   private onPointerDown(e: PointerEvent): void {
-    // Ignore if clicking on interactive HUD elements (buttons, joystick, docks)
+    // Ignore if clicking on interactive HUD elements
     const target = e.target as HTMLElement;
     if (
       target.closest('#hud-container button') ||
-      target.closest('.joystick-zone') ||
       target.closest('.gamer-dock-left') ||
       target.closest('.gamer-dock-right') ||
-      target.closest('.hud-chip')
+      target.closest('.hud-chip') ||
+      target.closest('.chat-system') ||
+      target.closest('.game-dialog-card')
     ) {
+      return;
+    }
+
+    // Left half of screen is reserved for invisible movement joystick (unless 2-finger pinch)
+    if (e.clientX < window.innerWidth * 0.48 && this.activePointers.size === 0) {
       return;
     }
 
