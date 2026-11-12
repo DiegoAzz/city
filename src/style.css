@@ -223,20 +223,281 @@ html, body {
   font-size: 0.95rem;
 }
 
-/* ========================================= */
-/* --- GAMER DOCK LEFT: MOBILITY / VEHICLES - */
-/* ========================================= */
-.gamer-dock-left {
+/* ==========================================================================
+   ROBLOX / BROOKHAVEN CLEAN MOBILE HUD DISTRIBUTION
+   ========================================================================== */
+
+.hud-btn-roblox {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.hud-btn-roblox:active {
+  transform: scale(0.92);
+  background: rgba(56, 189, 248, 0.35);
+  border-color: #38bdf8;
+}
+
+.online-chip {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #a7f3d0;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* Right Edge Roblox-style Dock */
+.roblox-dock-right {
   position: absolute;
-  left: calc(var(--safe-left) + 12px);
-  top: 50%;
+  right: calc(env(safe-area-inset-right) + 12px);
+  top: 48%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
+  align-items: flex-end;
+  z-index: 100;
   pointer-events: auto;
-  z-index: 25;
 }
+
+.dock-item-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.roblox-dock-btn {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.roblox-dock-btn:active {
+  transform: scale(0.94);
+  border-color: #38bdf8;
+}
+
+.roblox-dock-btn .dock-icon {
+  font-size: 1.15rem;
+}
+
+.roblox-dock-btn .dock-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Flyout Menus that slide out to the left of the dock */
+.dock-flyout {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  padding: 6px 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 110;
+  white-space: nowrap;
+  animation: slideFlyout 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideFlyout {
+  from { opacity: 0; transform: translateY(-50%) translateX(12px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+/* Slide-out Menu Drawer for Settings & City Options */
+.roblox-menu-drawer {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 52px);
+  left: calc(env(safe-area-inset-left) + 12px);
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  padding: 12px 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  min-width: 210px;
+  animation: fadeInModal 0.2s ease;
+  pointer-events: auto;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.drawer-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.drawer-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.drawer-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.drawer-action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.drawer-action-btn:active {
+  transform: scale(0.95);
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #38bdf8;
+}
+
+.drawer-action-btn .action-icon {
+  font-size: 1.25rem;
+}
+
+.drawer-action-btn .action-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+/* Roblox Bottom Right Jump & Actions */
+.roblox-actions-bottom-right {
+  position: absolute;
+  right: calc(env(safe-area-inset-right) + 16px);
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.roblox-sub-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.roblox-btn-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.roblox-btn-circle:active,
+.roblox-btn-circle.active {
+  transform: scale(0.92);
+  background: rgba(14, 165, 233, 0.4);
+  border-color: #38bdf8;
+}
+
+/* The Big Roblox Jump Button */
+.roblox-btn-jump {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2.5px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-size: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.roblox-btn-jump:active,
+.roblox-btn-jump.active {
+  transform: scale(0.92);
+  background: rgba(56, 189, 248, 0.45);
+  border-color: #38bdf8;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+}
+
+.jump-arrow-icon {
+  font-weight: 900;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
 
 .mode-pill {
   background: var(--bg-surface);
@@ -245,7 +506,7 @@ html, body {
   border: 1px solid var(--border-glass);
   color: var(--text-muted);
   border-radius: 9999px;
-  padding: 6px 11px;
+  padding: 6px 12px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -255,7 +516,6 @@ html, body {
   transition: all 0.15s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   white-space: nowrap;
-  width: 78px;
 }
 
 .mode-pill .mode-icon {

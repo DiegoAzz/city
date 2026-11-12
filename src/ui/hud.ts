@@ -167,6 +167,53 @@ export class Hud {
     this.qualityManager.onProfileChange((profile) => {
       this.updateQualityDisplay(profile);
     });
+
+    // Roblox Foldable Docks & Flyouts
+    this.bindRobloxFlyouts();
+  }
+
+  private bindRobloxFlyouts(): void {
+    const btnVehicle = document.getElementById('btn-dock-vehicle');
+    const flyoutVehicles = document.getElementById('flyout-vehicles');
+    btnVehicle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      flyoutVehicles?.classList.toggle('hidden');
+      document.getElementById('flyout-camera')?.classList.add('hidden');
+      document.getElementById('flyout-main-menu')?.classList.add('hidden');
+    });
+
+    const btnCamera = document.getElementById('btn-dock-camera');
+    const flyoutCamera = document.getElementById('flyout-camera');
+    btnCamera?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      flyoutCamera?.classList.toggle('hidden');
+      flyoutVehicles?.classList.add('hidden');
+      document.getElementById('flyout-main-menu')?.classList.add('hidden');
+    });
+
+    const btnMenu = document.getElementById('btn-roblox-menu');
+    const flyoutMenu = document.getElementById('flyout-main-menu');
+    btnMenu?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      flyoutMenu?.classList.toggle('hidden');
+      flyoutVehicles?.classList.add('hidden');
+      flyoutCamera?.classList.add('hidden');
+    });
+
+    const btnMenuClose = document.getElementById('btn-menu-close');
+    btnMenuClose?.addEventListener('click', () => {
+      flyoutMenu?.classList.add('hidden');
+    });
+
+    // Close flyouts on touch anywhere on map
+    document.addEventListener('pointerdown', (e) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.roblox-dock-right') && !target.closest('.roblox-menu-drawer') && !target.closest('#btn-roblox-menu')) {
+        flyoutVehicles?.classList.add('hidden');
+        flyoutCamera?.classList.add('hidden');
+        flyoutMenu?.classList.add('hidden');
+      }
+    });
   }
 
   private triggerJump(): void {
@@ -210,6 +257,7 @@ export class Hud {
     });
 
     this.characterController.setMovementMode(mode);
+    document.getElementById('flyout-vehicles')?.classList.add('hidden');
 
     if (mode === 'boat') {
       this.soundSystem.playWaterSplash();

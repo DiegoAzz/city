@@ -194,70 +194,139 @@
       </div>
     </section>
 
-    <!-- 3. IN-GAME HUD OVERLAY (Initially hidden until user presses JUGAR) -->
+    <!-- 3. IN-GAME HUD OVERLAY (ROBLOX / BROOKHAVEN STYLE) -->
     <div id="hud-container" class="hidden">
-      <!-- Top Bar -->
+      <!-- Top Bar: Roblox Clean Bar -->
       <header class="hud-top">
         <div class="hud-top-left">
-          <!-- Roleplay Badge -->
-          <button id="player-role-badge" class="hud-chip role-badge" aria-label="Rol actual" title="Tu Identidad en THE FANTASTIC ONE">
-            <span class="role-emoji">🌴</span>
-            <span class="role-name">Turista</span>
+          <!-- Roblox Style Menu Button (☰) -->
+          <button id="btn-roblox-menu" class="hud-btn-roblox" aria-label="Menú principal" title="Menú de Ajustes">
+            <span class="btn-icon">☰</span>
           </button>
 
-          <!-- City Indicator -->
-          <div class="hud-chip location-badge" title="Toca para alternar telemetría">
-            <span class="location-dot"></span>
-            <span class="location-name">Cartagena</span>
-          </div>
-
-          <!-- Multiplayer & Live Chat -->
-          <button id="btn-multiplayer-hub" class="hud-chip multiplayer-badge" aria-label="Centro Multijugador y Chat" title="Abrir Multijugador y Chat">
-            <span class="pulse-dot-green"></span>
-            <span class="btn-icon">👥</span>
-            <span id="header-player-count" class="btn-text">1 Online</span>
+          <!-- Roblox Style Chat Button (💬) -->
+          <button id="btn-multiplayer-hub" class="hud-btn-roblox" aria-label="Chat y Multijugador" title="Abrir Chat Multijugador">
+            <span class="btn-icon">💬</span>
             <span id="chat-unread-badge" class="chat-unread hidden">0</span>
+          </button>
+
+          <!-- Role / Identity Badge -->
+          <button id="player-role-badge" class="hud-chip role-badge" aria-label="Rol actual" title="Tu Identidad">
+            <span class="role-emoji">🌴</span>
+            <span class="role-name">Turista</span>
           </button>
         </div>
 
         <div class="hud-top-actions">
           <!-- Virtual Economy Balance -->
-          <div class="hud-chip economy-chip" title="Saldo virtual para adquirir y decorar propiedades">
+          <div class="hud-chip economy-chip" title="Saldo virtual">
             <span class="coin-icon">💰</span>
             <span id="player-balance-text" class="coin-value">$1,000</span>
           </div>
 
-          <!-- Audio, Graphics Quality and Cinema Mode -->
-          <button id="btn-sound" class="hud-btn hud-btn-round" aria-label="Sonido" title="Alternar Sonido">
-            <span id="sound-icon" class="btn-icon">🔊</span>
-          </button>
-          <button id="btn-quality" class="hud-btn hud-chip" aria-label="Calidad gráfica" title="Perfil de rendimiento">
-            <span id="quality-indicator">⚡ 45 FPS</span>
-          </button>
-          <button id="btn-stream" class="hud-btn hud-btn-round" aria-label="Modo transmisión" title="Ocultar interfaz">
-            <span class="btn-icon">📺</span>
-          </button>
+          <!-- Multiplayer Online Count -->
+          <div class="hud-chip online-chip" title="Jugadores en la ciudad">
+            <span class="pulse-dot-green"></span>
+            <span id="header-player-count">1 Online</span>
+          </div>
         </div>
       </header>
 
-      <!-- Camera & Zoom Control Dock (Top Right) -->
-      <div class="camera-dock" aria-label="Controles de Cámara y Zoom">
-        <button id="btn-zoom-in" class="hud-btn hud-btn-round action-zoom" aria-label="Agrandar" title="Agrandar">
-          <span class="btn-icon">➕</span>
-        </button>
-        <button id="btn-zoom-out" class="hud-btn hud-btn-round action-zoom" aria-label="Alejar" title="Alejar">
-          <span class="btn-icon">➖</span>
-        </button>
-        <button id="btn-rotate" class="hud-btn hud-btn-round action-rotate" aria-label="Girar Ángulo" title="Girar Ángulo 45°">
-          <span class="btn-icon">🔄</span>
-        </button>
-        <button id="btn-camera" class="hud-btn hud-chip action-camera" aria-label="Modo de Cámara" title="Cambiar Perspectiva">
-          <span class="btn-icon">🎥</span>
-          <span id="camera-label" class="btn-text">ISO</span>
-        </button>
+      <!-- Roblox Style Right Edge Menu Strip (Collapsible Dock) -->
+      <aside class="roblox-dock-right" aria-label="Menú lateral de acciones">
+        <!-- 1. Vehículos Button & Flyout -->
+        <div class="dock-item-wrapper">
+          <button id="btn-dock-vehicle" class="roblox-dock-btn" aria-label="Garaje de Vehículos" title="Garaje">
+            <span class="dock-icon">🚗</span>
+            <span class="dock-label">Vehículo</span>
+          </button>
+
+          <!-- Horizontal Slide-Out Flyout for Vehicles -->
+          <div id="flyout-vehicles" class="dock-flyout flyout-left hidden">
+            <button class="mode-pill active" data-mode="foot" title="Explorador a pie">
+              <span class="mode-icon">🚶</span>
+              <span class="mode-text">Pie</span>
+            </button>
+            <button class="mode-pill" data-mode="bicycle" title="Bicicleta Urbana">
+              <span class="mode-icon">🚲</span>
+              <span class="mode-text">Bici</span>
+            </button>
+            <button class="mode-pill" data-mode="motorcycle" title="Moto Vespa">
+              <span class="mode-icon">🛵</span>
+              <span class="mode-text">Moto</span>
+            </button>
+            <button class="mode-pill" data-mode="car" title="Carro Deportivo">
+              <span class="mode-icon">🚗</span>
+              <span class="mode-text">Carro</span>
+            </button>
+            <button class="mode-pill" data-mode="boat" title="Lancha Marítima">
+              <span class="mode-icon">🚤</span>
+              <span class="mode-text">Barco</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Cámara Button & Flyout -->
+        <div class="dock-item-wrapper">
+          <button id="btn-dock-camera" class="roblox-dock-btn" aria-label="Cámara y Zoom" title="Cámara">
+            <span class="dock-icon">🎥</span>
+            <span id="camera-label" class="dock-label">ISO</span>
+          </button>
+
+          <!-- Horizontal Slide-Out Flyout for Camera -->
+          <div id="flyout-camera" class="dock-flyout flyout-left hidden">
+            <button id="btn-camera" class="hud-btn hud-chip action-camera" title="Cambiar Vista">
+              <span class="btn-icon">🔄</span>
+              <span>Cambiar Vista</span>
+            </button>
+            <button id="btn-zoom-in" class="hud-btn hud-btn-round action-zoom" title="Acercar">
+              <span class="btn-icon">➕</span>
+            </button>
+            <button id="btn-zoom-out" class="hud-btn hud-btn-round action-zoom" title="Alejar">
+              <span class="btn-icon">➖</span>
+            </button>
+            <button id="btn-rotate" class="hud-btn hud-btn-round action-rotate" title="Rotar 45°">
+              <span class="btn-icon">🔃</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Telemetría / Ciudad Toggle -->
+        <div class="dock-item-wrapper">
+          <button id="btn-dock-location" class="roblox-dock-btn location-badge" aria-label="Cartagena" title="Info Ciudad y FPS">
+            <span class="dock-icon">📍</span>
+            <span class="dock-label">Cartagena</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Roblox Main Options Slide-Out Drawer (☰) -->
+      <div id="flyout-main-menu" class="roblox-menu-drawer hidden" aria-label="Ajustes del juego">
+        <div class="drawer-header">
+          <span class="drawer-title">Ajustes & Opciones</span>
+          <button id="btn-menu-close" class="drawer-close-btn" type="button">✕</button>
+        </div>
+        <div class="drawer-actions-grid">
+          <button id="btn-sound" class="drawer-action-btn">
+            <span id="sound-icon" class="action-icon">🔊</span>
+            <span class="action-text">Sonido</span>
+          </button>
+          <button id="btn-quality" class="drawer-action-btn">
+            <span class="action-icon">⚡</span>
+            <span id="quality-indicator" class="action-text">45 FPS</span>
+          </button>
+          <button id="btn-recenter" class="drawer-action-btn">
+            <span class="action-icon">🎯</span>
+            <span class="action-text">Plaza Central</span>
+          </button>
+          <button id="btn-stream" class="drawer-action-btn">
+            <span class="action-icon">📺</span>
+            <span class="action-text">Modo Cine</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Dev Metrics Overlay (Hidden by default, tap Cartagena to toggle) -->
+      <!-- Dev Metrics Overlay (Toggled from Cartagena button) -->
       <div id="perf-overlay" class="perf-stats hidden">
         <div class="stat-row"><strong>FPS:</strong> <span id="stat-fps">--</span> (<span id="stat-target">45</span> cap)</div>
         <div class="stat-row"><strong>Frame:</strong> <span id="stat-ms">--</span> ms</div>
@@ -269,66 +338,34 @@
       <!-- Notification Toast -->
       <div id="toast" class="toast hidden"></div>
 
-      <!-- Mobility / Garage Side Dock (Left Side) -->
-      <aside class="gamer-dock-left" aria-label="Selector de Movilidad y Garaje">
-        <button class="mode-pill active" data-mode="foot" aria-label="A pie" title="Explorador a pie">
-          <span class="mode-icon">🚶</span>
-          <span class="mode-text">Pie</span>
-        </button>
-        <button class="mode-pill" data-mode="bicycle" aria-label="Bicicleta" title="Bicicleta Urbana">
-          <span class="mode-icon">🚲</span>
-          <span class="mode-text">Bici</span>
-        </button>
-        <button class="mode-pill" data-mode="motorcycle" aria-label="Moto" title="Moto Vespa">
-          <span class="mode-icon">🛵</span>
-          <span class="mode-text">Moto</span>
-        </button>
-        <button class="mode-pill" data-mode="car" aria-label="Carro" title="Carro Deportivo">
-          <span class="mode-icon">🚗</span>
-          <span class="mode-text">Carro</span>
-        </button>
-        <button class="mode-pill" data-mode="boat" aria-label="Barco" title="Lancha Marítima">
-          <span class="mode-icon">🚤</span>
-          <span class="mode-text">Barco</span>
-        </button>
-      </aside>
-
-      <!-- Bottom Touch Controls Area -->
+      <!-- Bottom Touch Controls Area: Clean Left Side + Roblox Bottom-Right Jump -->
       <footer class="hud-bottom">
-        <!-- Left: Invisible Floating Joystick Touch Zone (Dynamic Origin on Touch) -->
+        <!-- Left 50vw: 100% UNCLUTTERED Invisible Floating Dynamic Joystick Zone -->
         <div id="touch-zone-left" class="touch-zone-left" aria-label="Zona táctil de movimiento invisible">
-          <!-- Dynamic faint feedback ring (appears only under thumb during touch) -->
           <div id="joystick-feedback" class="joystick-feedback-ring hidden"></div>
         </div>
 
-        <!-- Right Gamer Action Cluster: Vertical Side Stack -->
-        <div class="gamer-dock-right">
-          <button id="btn-jump" class="hud-btn hud-btn-circle action-jump" aria-label="Saltar" title="Saltar">
-            <span class="btn-icon">🦘</span>
-            <span class="btn-text">Salto</span>
-          </button>
-          <button id="btn-horn" class="hud-btn hud-btn-circle action-horn" aria-label="Bocina / Campana" title="Tocar Bocina">
-            <span class="btn-icon">📢</span>
-            <span class="btn-text">Bocina</span>
-          </button>
-          <button id="btn-run" class="hud-btn hud-btn-circle action-run" aria-label="Turbo" title="Turbo / Correr">
-            <span class="btn-icon">⚡</span>
-            <span class="btn-text">Turbo</span>
-          </button>
-          <button id="btn-recenter" class="hud-btn hud-btn-circle action-recenter" aria-label="Centrar personaje" title="Plaza Santo Domingo">
-            <span class="btn-icon">🎯</span>
-            <span class="btn-text">Centrar</span>
+        <!-- Right Side: Roblox-Style Big Floating Jump Button and Quick Turbo/Horn -->
+        <div class="roblox-actions-bottom-right">
+          <!-- Auxiliary Turbo / Horn Buttons -->
+          <div class="roblox-sub-actions">
+            <button id="btn-run" class="roblox-btn-circle action-run" aria-label="Turbo" title="Turbo / Correr">
+              <span class="btn-icon">⚡</span>
+            </button>
+            <button id="btn-horn" class="roblox-btn-circle action-horn" aria-label="Bocina" title="Bocina">
+              <span class="btn-icon">📢</span>
+            </button>
+          </div>
+
+          <!-- The Big Roblox Jump Button -->
+          <button id="btn-jump" class="roblox-btn-jump action-jump" aria-label="Saltar" title="Saltar">
+            <span class="jump-arrow-icon">⬆</span>
           </button>
         </div>
       </footer>
-
-      <!-- Game Footer -->
-      <div class="map-attribution-bar">
-        <span>THE FANTASTIC ONE · Videojuego de Mundo Abierto</span>
-      </div>
     </div>
 
-    <!-- Global High-Priority Restore Button (Outside HUD container so never dimmed) -->
+    <!-- Global High-Priority Restore Button -->
     <button id="btn-exit-stream" class="exit-stream-pill hidden" aria-label="Restaurar Controles">
       <span class="btn-icon">👁️</span>
       <span>Restaurar Controles</span>
