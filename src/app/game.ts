@@ -19,6 +19,7 @@ import { IntroManager } from '../ui/intro/intro-manager';
 import { EconomyManager } from '../economy/economy-manager';
 import { PropertyManager } from '../properties/property-manager';
 import { PropertyModal } from '../ui/properties/property-modal';
+import { DecorationManager } from '../decorations/decoration-manager';
 
 export class Game {
   private character: CharacterController;
@@ -39,6 +40,7 @@ export class Game {
   private economy: EconomyManager;
   private propertyManager: PropertyManager;
   private propertyModal: PropertyModal | null = null;
+  private decorationManager: DecorationManager;
 
   private isRunning: boolean = false;
   private lastFrameTime: number = performance.now();
@@ -81,6 +83,7 @@ export class Game {
     this.economy = new EconomyManager();
     this.propertyManager = new PropertyManager(this.economy, this.multiplayer);
     this.propertyModal = null; // In pure Sandbox mode, no blocking popups or property modals
+    this.decorationManager = new DecorationManager(this.economy, this.multiplayer);
 
     // Listen for multiplayer property synchronization
     this.multiplayer.onPropertyUpdated((prop) => {
@@ -149,6 +152,7 @@ export class Game {
 
       // Connect multiplayer manager to Three.js custom layer
       this.mapManager.getThreeLayer()?.setMultiplayerManager(this.multiplayer);
+      this.mapManager.getThreeLayer()?.setDecorationManager(this.decorationManager);
 
       this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
@@ -230,6 +234,10 @@ export class Game {
 
   public getPropertyManager(): PropertyManager {
     return this.propertyManager;
+  }
+
+  public getDecorationManager(): DecorationManager {
+    return this.decorationManager;
   }
 
   public getPropertyModal(): PropertyModal | null {

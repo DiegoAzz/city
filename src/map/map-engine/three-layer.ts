@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import maplibregl, { CustomLayerInterface, CustomRenderMethodInput, Map as MapLibreMap } from 'maplibre-gl';
 import { CharacterController } from '../../character/controller/character-controller';
 import type { MultiplayerManager } from '../../multiplayer/multiplayer-manager';
+import type { DecorationManager } from '../../decorations/decoration-manager';
 
 export class ThreeCharacterLayer implements CustomLayerInterface {
   public id: string = 'three-character-layer';
@@ -14,6 +15,7 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   private renderer: THREE.WebGLRenderer | null = null;
   private characterController: CharacterController;
   private multiplayerManager: MultiplayerManager | null = null;
+  private decorationManager: DecorationManager | null = null;
 
   constructor(characterController: CharacterController) {
     this.characterController = characterController;
@@ -47,6 +49,11 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   public setMultiplayerManager(multiplayerManager: MultiplayerManager): void {
     this.multiplayerManager = multiplayerManager;
     this.multiplayerManager.setScene(this.scene);
+  }
+
+  public setDecorationManager(decorationManager: DecorationManager): void {
+    this.decorationManager = decorationManager;
+    this.decorationManager.setScene(this.scene);
   }
 
   public onAdd(map: MapLibreMap, gl: WebGLRenderingContext | WebGL2RenderingContext): void {
@@ -106,6 +113,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
         peer.rigs.root.position.set(dEastMeters, 0, -dNorthMeters);
       }
     }
+
+    // Update 3D decoration positions
+    this.decorationManager?.updatePositions(lng, lat);
 
     this.camera.projectionMatrix = m.multiply(l);
     this.renderer.resetState();
