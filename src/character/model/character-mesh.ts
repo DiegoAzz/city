@@ -12,6 +12,15 @@ export interface CharacterRigs {
   leftLeg: THREE.Group;
   rightLeg: THREE.Group;
   shadow: THREE.Mesh;
+  accessories: {
+    phone: THREE.Group;
+    coffee: THREE.Group;
+    flashlight: THREE.Group;
+    skateboard: THREE.Group;
+  };
+  carWheels: THREE.Mesh[];
+  carLights?: THREE.PointLight;
+  carBrakeLights?: THREE.Mesh[];
   vehicles: {
     bicycle: THREE.Group;
     motorcycle: THREE.Group;
@@ -69,7 +78,6 @@ export function createCharacterMesh(): CharacterRigs {
   const metalMaterial = new THREE.MeshLambertMaterial({ color: 0x94a3b8, emissive: 0x475569, emissiveIntensity: 0.2 });
   const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x1e293b });
   const vehicleBodyRed = new THREE.MeshLambertMaterial({ color: 0xef4444, emissive: 0xb91c1c, emissiveIntensity: 0.35 });
-  const vehicleBodyYellow = new THREE.MeshLambertMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.35 });
   const vehicleBodyCyan = new THREE.MeshLambertMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.35 });
   const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xfef08a });
 
@@ -155,9 +163,9 @@ export function createCharacterMesh(): CharacterRigs {
   const armMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.38, 12), hoodieMaterial);
   armMesh.position.set(0, -0.18, 0);
   leftArm.add(armMesh);
-  const handMesh = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), skinMaterial);
-  handMesh.position.set(0, -0.36, 0);
-  leftArm.add(handMesh);
+  const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), skinMaterial);
+  leftHand.position.set(0, -0.36, 0);
+  leftArm.add(leftHand);
 
   // --- Right Arm ---
   const rightArm = new THREE.Group();
@@ -191,6 +199,85 @@ export function createCharacterMesh(): CharacterRigs {
   const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.11, 0.20), shoesMaterial);
   rightShoe.position.set(0, -0.44, 0.04);
   rightLeg.add(rightShoe);
+
+  // ==========================================
+  // --- HAND-HELD ACCESSORIES (ROBLOX HOTBAR) ---
+  // ==========================================
+
+  // 1. Smartphone (Right Hand)
+  const phoneGroup = new THREE.Group();
+  phoneGroup.visible = false;
+  rightHand.add(phoneGroup);
+  const phoneBody = new THREE.Mesh(
+    new THREE.BoxGeometry(0.09, 0.16, 0.015),
+    new THREE.MeshLambertMaterial({ color: 0x0f172a })
+  );
+  phoneBody.position.set(0.04, -0.02, 0.08);
+  phoneBody.rotation.x = -Math.PI / 4;
+  const phoneScreen = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.08, 0.14),
+    new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+  );
+  phoneScreen.position.set(0, 0, 0.009);
+  phoneBody.add(phoneScreen);
+  phoneGroup.add(phoneBody);
+
+  // 2. Coffee Cup (Left Hand)
+  const coffeeGroup = new THREE.Group();
+  coffeeGroup.visible = false;
+  leftHand.add(coffeeGroup);
+  const cupGeo = new THREE.CylinderGeometry(0.05, 0.04, 0.14, 12);
+  const cupMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const cupMesh = new THREE.Mesh(cupGeo, cupMat);
+  cupMesh.position.set(-0.02, -0.06, 0.08);
+  const sleeveGeo = new THREE.CylinderGeometry(0.051, 0.045, 0.06, 12);
+  const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+  const sleeveMesh = new THREE.Mesh(sleeveGeo, sleeveMat);
+  cupMesh.add(sleeveMesh);
+  const lidGeo = new THREE.CylinderGeometry(0.054, 0.054, 0.02, 12);
+  const lidMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+  const lidMesh = new THREE.Mesh(lidGeo, lidMat);
+  lidMesh.position.y = 0.075;
+  cupMesh.add(lidMesh);
+  coffeeGroup.add(cupMesh);
+
+  // 3. Flashlight (Right Hand)
+  const flashlightGroup = new THREE.Group();
+  flashlightGroup.visible = false;
+  rightHand.add(flashlightGroup);
+  const torchBody = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.035, 0.045, 0.20, 10),
+    new THREE.MeshLambertMaterial({ color: 0x1e293b })
+  );
+  torchBody.position.set(0.04, -0.04, 0.12);
+  torchBody.rotation.x = Math.PI / 2;
+  const torchLens = new THREE.Mesh(
+    new THREE.CircleGeometry(0.042, 10),
+    new THREE.MeshBasicMaterial({ color: 0xfffbeb })
+  );
+  torchLens.position.set(0, 0.101, 0);
+  torchLens.rotation.x = -Math.PI / 2;
+  torchBody.add(torchLens);
+  flashlightGroup.add(torchBody);
+
+  // 4. Skateboard (Under Feet)
+  const skateboardGroup = new THREE.Group();
+  skateboardGroup.visible = false;
+  container.add(skateboardGroup);
+  const deckMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.36, 0.035, 1.05),
+    new THREE.MeshLambertMaterial({ color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 0.2 })
+  );
+  deckMesh.position.set(0, 0.08, 0);
+  skateboardGroup.add(deckMesh);
+  const sWheelGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.045, 10);
+  sWheelGeo.rotateZ(Math.PI / 2);
+  const sWheelMat = new THREE.MeshLambertMaterial({ color: 0x06b6d4 });
+  [[-0.15, 0.045, 0.35], [0.15, 0.045, 0.35], [-0.15, 0.045, -0.35], [0.15, 0.045, -0.35]].forEach(([x, y, z]) => {
+    const w = new THREE.Mesh(sWheelGeo, sWheelMat);
+    w.position.set(x, y, z);
+    skateboardGroup.add(w);
+  });
 
   // ==========================================
   // --- MINI CARTOON VEHICLES ---
@@ -240,34 +327,140 @@ export function createCharacterMesh(): CharacterRigs {
   mHandle.position.set(0, 0.65, 0.32);
   motoGroup.add(mHandle);
 
-  // 3. Mini Carro Kart
+  // 3. Convertible Deportivo Estilo Roblox
   const carGroup = new THREE.Group();
   carGroup.visible = false;
   container.add(carGroup);
-  const carBody = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.36, 1.25), vehicleBodyYellow);
-  carBody.position.set(0, 0.28, 0);
-  carGroup.add(carBody);
-  const carShield = new THREE.Mesh(
-    new THREE.BoxGeometry(0.65, 0.24, 0.05),
-    new THREE.MeshLambertMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.7 })
+
+  const sportsRed = new THREE.MeshLambertMaterial({
+    color: 0xef4444, // Bright Ferrari Red
+    emissive: 0x991b1b,
+    emissiveIntensity: 0.35
+  });
+  const sportsBlack = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+  const rimSilver = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+  const tireRubber = new THREE.MeshLambertMaterial({ color: 0x18181b });
+
+  // Aerodynamic main chassis
+  const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.32, 2.05), sportsRed);
+  chassis.position.set(0, 0.28, 0);
+  carGroup.add(chassis);
+
+  // Black Racing Stripes & Hood Scoop
+  const hoodScoop = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.06, 0.65), sportsBlack);
+  hoodScoop.position.set(0, 0.45, 0.45);
+  carGroup.add(hoodScoop);
+
+  // Front splitter & black bumper
+  const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(1.08, 0.12, 0.25), sportsBlack);
+  frontBumper.position.set(0, 0.16, 1.02);
+  carGroup.add(frontBumper);
+
+  // Curved Tinted Windshield
+  const carWindshield = new THREE.Mesh(
+    new THREE.BoxGeometry(0.92, 0.32, 0.05),
+    new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
   );
-  carShield.position.set(0, 0.54, 0.22);
-  carShield.rotation.x = -0.25;
-  carGroup.add(carShield);
-  const carWheelGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.12, 14);
-  carWheelGeo.rotateZ(Math.PI / 2);
-  const cWFL = new THREE.Mesh(carWheelGeo, wheelMaterial);
-  cWFL.position.set(-0.42, 0.18, 0.40);
-  carGroup.add(cWFL);
-  const cWFR = new THREE.Mesh(carWheelGeo, wheelMaterial);
-  cWFR.position.set(0.42, 0.18, 0.40);
-  carGroup.add(cWFR);
-  const cWBL = new THREE.Mesh(carWheelGeo, wheelMaterial);
-  cWBL.position.set(-0.42, 0.18, -0.40);
-  carGroup.add(cWBL);
-  const cWBR = new THREE.Mesh(carWheelGeo, wheelMaterial);
-  cWBR.position.set(0.42, 0.18, -0.40);
-  carGroup.add(cWBR);
+  carWindshield.position.set(0, 0.56, 0.22);
+  carWindshield.rotation.x = -0.38;
+  carGroup.add(carWindshield);
+
+  // Dual Racing Bucket Seats
+  const seatL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.36, 0.38), sportsBlack);
+  seatL.position.set(-0.24, 0.38, -0.20);
+  carGroup.add(seatL);
+  const headrestL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.12), sportsRed);
+  headrestL.position.set(-0.24, 0.60, -0.32);
+  carGroup.add(headrestL);
+
+  const seatR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.36, 0.38), sportsBlack);
+  seatR.position.set(0.24, 0.38, -0.20);
+  carGroup.add(seatR);
+  const headrestR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.12), sportsRed);
+  headrestR.position.set(0.24, 0.60, -0.32);
+  carGroup.add(headrestR);
+
+  // Sports Steering Wheel
+  const wheelTorus = new THREE.Mesh(
+    new THREE.TorusGeometry(0.12, 0.025, 8, 16),
+    sportsBlack
+  );
+  wheelTorus.position.set(-0.24, 0.52, 0.08);
+  wheelTorus.rotation.x = -0.45;
+  carGroup.add(wheelTorus);
+
+  // GT Rear Wing / Spoiler
+  const wingDeck = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.04, 0.26), sportsBlack);
+  wingDeck.position.set(0, 0.66, -0.92);
+  carGroup.add(wingDeck);
+  const wingPostL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.24, 0.06), sportsBlack);
+  wingPostL.position.set(-0.40, 0.52, -0.92);
+  carGroup.add(wingPostL);
+  const wingPostR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.24, 0.06), sportsBlack);
+  wingPostR.position.set(0.40, 0.52, -0.92);
+  carGroup.add(wingPostR);
+
+  // Dual Chrome Exhaust Tailpipes
+  const pipeGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.16, 10);
+  pipeGeo.rotateX(Math.PI / 2);
+  const pipeL = new THREE.Mesh(pipeGeo, metalMaterial);
+  pipeL.position.set(-0.28, 0.20, -1.04);
+  carGroup.add(pipeL);
+  const pipeR = new THREE.Mesh(pipeGeo, metalMaterial);
+  pipeR.position.set(0.28, 0.20, -1.04);
+  carGroup.add(pipeR);
+
+  // Projector LED Headlights + PointLight
+  const ledGeo = new THREE.BoxGeometry(0.22, 0.10, 0.06);
+  const ledMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+  const headL = new THREE.Mesh(ledGeo, ledMat);
+  headL.position.set(-0.36, 0.32, 1.02);
+  carGroup.add(headL);
+  const headR = new THREE.Mesh(ledGeo, ledMat);
+  headR.position.set(0.36, 0.32, 1.02);
+  carGroup.add(headR);
+
+  const carHeadlightsLight = new THREE.PointLight(0xfffbeb, 2.5, 25, 1.2);
+  carHeadlightsLight.position.set(0, 0.45, 1.8);
+  carGroup.add(carHeadlightsLight);
+
+  // Red LED Taillights (Brake lights)
+  const tailGeo = new THREE.BoxGeometry(0.24, 0.08, 0.04);
+  const tailMat = new THREE.MeshLambertMaterial({
+    color: 0xef4444,
+    emissive: 0xdc2626,
+    emissiveIntensity: 0.8
+  });
+  const tailL = new THREE.Mesh(tailGeo, tailMat);
+  tailL.position.set(-0.38, 0.34, -1.03);
+  carGroup.add(tailL);
+  const tailR = new THREE.Mesh(tailGeo, tailMat);
+  tailR.position.set(0.38, 0.34, -1.03);
+  carGroup.add(tailR);
+  const carBrakeLights = [tailL, tailR];
+
+  // 4 Alloy Wheels with Silver Rims & Tires (Stored for real rolling animation)
+  const carWheels: THREE.Mesh[] = [];
+  const tireGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 16);
+  tireGeo.rotateZ(Math.PI / 2);
+  const rimGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.165, 8);
+  rimGeo.rotateZ(Math.PI / 2);
+
+  const wheelPositions = [
+    [-0.56, 0.24, 0.65],  // Front Left
+    [0.56, 0.24, 0.65],   // Front Right
+    [-0.56, 0.24, -0.65], // Rear Left
+    [0.56, 0.24, -0.65]   // Rear Right
+  ];
+
+  wheelPositions.forEach(([x, y, z]) => {
+    const tire = new THREE.Mesh(tireGeo, tireRubber);
+    tire.position.set(x, y, z);
+    const rim = new THREE.Mesh(rimGeo, rimSilver);
+    tire.add(rim);
+    carGroup.add(tire);
+    carWheels.push(tire);
+  });
 
   // 4. Mini Lancha / Barco Motorizado
   const boatGroup = new THREE.Group();
@@ -341,6 +534,15 @@ export function createCharacterMesh(): CharacterRigs {
     leftLeg,
     rightLeg,
     shadow,
+    accessories: {
+      phone: phoneGroup,
+      coffee: coffeeGroup,
+      flashlight: flashlightGroup,
+      skateboard: skateboardGroup
+    },
+    carWheels,
+    carLights: carHeadlightsLight,
+    carBrakeLights,
     vehicles: {
       bicycle: bicycleGroup,
       motorcycle: motoGroup,

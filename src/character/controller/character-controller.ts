@@ -1,8 +1,9 @@
 import { CharacterRigs, createCharacterMesh, MovementMode } from '../model/character-mesh';
-import { CharacterAnimator, CharacterAnimState } from '../animation/character-animator';
+import { CharacterAnimator, CharacterAnimState, CharacterAccessory } from '../animation/character-animator';
 import { metersToDeltaDegrees } from '../../map/projection/mercator';
 import { clampToCartagenaBounds } from '../../map/geodata/cartagena';
 import type { CollisionSystem } from '../../navigation/collision-system';
+import { CarPhysics } from '../../vehicles/car-physics';
 
 export interface CharacterState {
   lng: number;
@@ -36,6 +37,7 @@ export class CharacterController {
   private isRunning: boolean = false;
   private movementMode: MovementMode = 'foot';
   private collisionSystem: CollisionSystem | null = null;
+  private carPhysics: CarPhysics = new CarPhysics();
 
   // Jump physics
   private verticalPosition: number = 0; // meters
@@ -54,6 +56,22 @@ export class CharacterController {
   public setMovementMode(mode: MovementMode): void {
     this.movementMode = mode;
     this.animator.setMovementMode(mode);
+    if (mode === 'car') {
+      const facingRad = (this.bearingDeg * Math.PI) / 180.0;
+      this.carPhysics.reset(facingRad);
+    }
+  }
+
+  public equipAccessory(acc: CharacterAccessory): void {
+    this.animator.setAccessory(acc);
+  }
+
+  public getAccessory(): CharacterAccessory {
+    return this.animator.getAccessory();
+  }
+
+  public playEmote(emote: 'dance' | 'sit'): void {
+    this.animator.setState(emote);
   }
 
   public setCollisionSystem(collisionSystem: CollisionSystem): void {
@@ -134,7 +152,60 @@ export class CharacterController {
       this.rigs.container.position.y = this.verticalPosition;
     }
 
-    // 2. Horizontal Movement
+    // 2. Realistic Sports Car Driving Physics (Brookhaven Style)
+    if (this.movementMode === 'car') {
+      const cameraBearingRad = (cameraBearingDeg * Math.PI) / 180.0;
+      const carResult = this.carPhysics.update(
+        deltaSeconds,
+        joystickVector.x,
+        joystickVector.y,
+        cameraBearingRad
+      );
+
+      this.currentSpeedMps = carResult.speedMps;
+      const worldHeadingRad = carResult.headingRad;
+      this.bearingDeg = (worldHeadingRad * 180.0) / Math.PI;
+      const threeFacingRad = Math.PI - worldHeadingRad;
+      this.animator.setFacingAngle(threeFacingRad);
+
+      // Tail lights react to braking
+      if (this.rigs.carBrakeLights) {
+        this.rigs.carBrakeLights.forEach((l) => {
+          const mat = l.material as any;
+          if (mat) mat.emissiveIntensity = carResult.isBraking ? 1.8 : 0.6;
+        });
+      }
+
+      const moveDistMeters = carResult.speedMps * deltaSeconds;
+      const dxMeters = Math.sin(worldHeadingRad) * moveDistMeters;
+      const dyMeters = Math.cos(worldHeadingRad) * moveDistMeters;
+
+      if (this.collisionSystem) {
+        const bumperMargin = 0.25;
+        const res = this.collisionSystem.resolveMovement(
+          this.lng,
+          this.lat,
+          dxMeters,
+          dyMeters,
+          bumperMargin,
+          false
+        );
+        this.lng = res.lng;
+        this.lat = res.lat;
+      } else {
+        const [deltaLng, deltaLat] = metersToDeltaDegrees(dxMeters, dyMeters, this.lat);
+        const [nextLng, nextLat] = clampToCartagenaBounds(this.lng + deltaLng, this.lat + deltaLat);
+        this.lng = nextLng;
+        this.lat = nextLat;
+      }
+
+      const speedRatio = Math.abs(carResult.speedMps) / 14.0;
+      this.animator.setState('driving');
+      this.animator.update(deltaSeconds, speedRatio, true);
+      return;
+    }
+
+    // 3. Horizontal Foot / Bike Locomotion
     const magnitude = Math.hypot(joystickVector.x, joystickVector.y);
     const speedPreset = SPEED_PRESETS[this.movementMode];
 

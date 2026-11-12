@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { CharacterRigs, MovementMode } from '../model/character-mesh';
 
-export type CharacterAnimState = 'idle' | 'walk' | 'run' | 'jump' | 'driving';
+export type CharacterAnimState = 'idle' | 'walk' | 'run' | 'jump' | 'driving' | 'dance' | 'sit';
+export type CharacterAccessory = 'none' | 'phone' | 'coffee' | 'flashlight' | 'skateboard';
 
 export class CharacterAnimator {
   private rigs: CharacterRigs;
@@ -10,9 +11,24 @@ export class CharacterAnimator {
   private currentMode: MovementMode = 'foot';
   private targetBearing: number = 0;
   private currentBearing: number = 0;
+  private equippedAccessory: CharacterAccessory = 'none';
 
   constructor(rigs: CharacterRigs) {
     this.rigs = rigs;
+  }
+
+  public setAccessory(accessory: CharacterAccessory): void {
+    this.equippedAccessory = accessory;
+    if (this.rigs.accessories) {
+      this.rigs.accessories.phone.visible = accessory === 'phone';
+      this.rigs.accessories.coffee.visible = accessory === 'coffee';
+      this.rigs.accessories.flashlight.visible = accessory === 'flashlight';
+      this.rigs.accessories.skateboard.visible = accessory === 'skateboard';
+    }
+  }
+
+  public getAccessory(): CharacterAccessory {
+    return this.equippedAccessory;
   }
 
   public setState(state: CharacterAnimState): void {
@@ -74,8 +90,50 @@ export class CharacterAnimator {
         case 'run':
           this.animateRun(t);
           break;
+        case 'dance':
+          this.animateDance(t);
+          break;
+        case 'sit':
+          this.animateSit(t);
+          break;
       }
+      this.applyAccessoryArmPoses();
     }
+  }
+
+  private applyAccessoryArmPoses(): void {
+    if (this.equippedAccessory === 'phone') {
+      this.rigs.rightArm.rotation.x = 1.35;
+      this.rigs.rightArm.rotation.z = -0.35;
+      this.rigs.head.rotation.x = -0.25;
+    } else if (this.equippedAccessory === 'coffee') {
+      this.rigs.leftArm.rotation.x = 1.20;
+      this.rigs.leftArm.rotation.z = 0.35;
+    } else if (this.equippedAccessory === 'flashlight') {
+      this.rigs.rightArm.rotation.x = 1.55;
+      this.rigs.rightArm.rotation.z = 0;
+    }
+  }
+
+  private animateDance(t: number): void {
+    const bounce = Math.abs(Math.sin(t * 1.5)) * 0.12;
+    const sway = Math.sin(t * 1.5) * 0.35;
+
+    this.rigs.torso.position.y = 0.80 + bounce;
+    this.rigs.torso.rotation.y = sway;
+    this.rigs.leftArm.rotation.z = 1.2 + Math.sin(t * 2.0) * 0.4;
+    this.rigs.rightArm.rotation.z = -1.2 - Math.sin(t * 2.0) * 0.4;
+    this.rigs.leftArm.rotation.x = 0.5 + Math.cos(t * 2.0) * 0.3;
+    this.rigs.rightArm.rotation.x = 0.5 - Math.cos(t * 2.0) * 0.3;
+    this.rigs.head.rotation.z = -sway * 0.5;
+  }
+
+  private animateSit(_t: number): void {
+    this.rigs.torso.position.y = 0.35;
+    this.rigs.leftLeg.rotation.x = -1.55;
+    this.rigs.rightLeg.rotation.x = -1.55;
+    this.rigs.leftArm.rotation.x = 0.35;
+    this.rigs.rightArm.rotation.x = 0.35;
   }
 
   private updateRotation(deltaSeconds: number): void {
@@ -100,21 +158,36 @@ export class CharacterAnimator {
   }
 
   private animateRiding(t: number, speedMult: number): void {
-    // Sitting / Driving pose:
-    // Torso lowered slightly into seat
     const engineVibe = Math.sin(t * 2.0) * 0.015 * (speedMult > 0.05 ? 1.0 : 0.3);
-    this.rigs.torso.position.y = 0.62 + engineVibe;
 
-    // Arms forward holding handlebars/wheel
-    this.rigs.leftArm.rotation.x = 0.75;
-    this.rigs.rightArm.rotation.x = 0.75;
+    if (this.currentMode === 'car') {
+      // Sitting in the driver seat of the sports convertible
+      this.rigs.torso.position.set(-0.24, 0.44 + engineVibe, -0.16);
+      this.rigs.leftLeg.position.set(-0.34, 0.45, 0);
+      this.rigs.rightLeg.position.set(-0.14, 0.45, 0);
+      this.rigs.leftArm.rotation.set(0.9, -0.2, 0);
+      this.rigs.rightArm.rotation.set(0.9, 0.2, 0);
+      this.rigs.leftLeg.rotation.x = -1.25;
+      this.rigs.rightLeg.rotation.x = -1.25;
 
-    // Legs seated forward
-    this.rigs.leftLeg.rotation.x = -1.10;
-    this.rigs.rightLeg.rotation.x = -1.10;
+      // Realistic wheel rolling rotation
+      if (this.rigs.carWheels) {
+        this.rigs.carWheels.forEach((w) => {
+          w.rotation.x -= speedMult * 0.45;
+        });
+      }
+    } else {
+      this.rigs.torso.position.set(0, 0.62 + engineVibe, 0);
+      this.rigs.leftLeg.position.set(-0.13, 0.65, 0);
+      this.rigs.rightLeg.position.set(0.13, 0.65, 0);
+      this.rigs.leftArm.rotation.x = 0.75;
+      this.rigs.rightArm.rotation.x = 0.75;
+      this.rigs.leftLeg.rotation.x = -1.10;
+      this.rigs.rightLeg.rotation.x = -1.10;
+    }
 
     // Lean slightly into turns or speed
-    this.rigs.container.rotation.x = speedMult > 0.1 ? 0.08 : 0.0;
+    this.rigs.container.rotation.x = speedMult > 0.1 ? 0.06 : 0.0;
   }
 
   private animateIdle(t: number, dt: number): void {

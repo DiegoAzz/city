@@ -367,6 +367,50 @@ export class Hud {
       f?.addEventListener('pointerdown', (e) => e.stopPropagation());
       f?.addEventListener('click', (e) => e.stopPropagation());
     });
+
+    // Roblox Style Hotbar Items & Emotes (Fase 8)
+    const hotbarSlots = document.querySelectorAll<HTMLButtonElement>('.hotbar-slot');
+    hotbarSlots.forEach((slot) => {
+      slot.addEventListener('pointerdown', (e) => e.stopPropagation());
+      slot.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const tool = slot.getAttribute('data-tool');
+        const emote = slot.getAttribute('data-emote');
+
+        if (tool) {
+          const currentAcc = this.characterController.getAccessory();
+          if (currentAcc === tool) {
+            this.characterController.equipAccessory('none');
+            slot.classList.remove('active');
+            this.showToast('Desequipado');
+          } else {
+            hotbarSlots.forEach((s) => s.classList.remove('active'));
+            slot.classList.add('active');
+            this.characterController.equipAccessory(tool as any);
+            const toolNames: Record<string, string> = {
+              phone: '📱 Teléfono Móvil equipado',
+              coffee: '☕ Café Juan Valdez en mano',
+              flashlight: '🔦 Linterna encendida',
+              skateboard: '🛹 Patineta equipada'
+            };
+            this.showToast(toolNames[tool] || 'Objeto equipado');
+            this.soundSystem.playHorn('bicycle');
+          }
+        } else if (emote) {
+          hotbarSlots.forEach((s) => s.classList.remove('active'));
+          slot.classList.add('active');
+          this.characterController.playEmote(emote as any);
+          const emoteNames: Record<string, string> = {
+            dance: '🕺 ¡Bailando salsa en la plaza!',
+            sit: '🪑 Sentado descansando'
+          };
+          this.showToast(emoteNames[emote] || 'Emote');
+          setTimeout(() => slot.classList.remove('active'), 2500);
+        }
+      });
+    });
   }
 
   private triggerJump(): void {

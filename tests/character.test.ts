@@ -75,4 +75,29 @@ describe('Character Controller & Movement Physics', () => {
     expect(state.animState).toBe('idle');
     expect(state.speedMps).toBe(0);
   });
+
+  it('equips and unequips hand-held accessories and emotes', () => {
+    const controller = new CharacterController(initialLng, initialLat);
+    expect(controller.getAccessory()).toBe('none');
+
+    controller.equipAccessory('phone');
+    expect(controller.getAccessory()).toBe('phone');
+
+    controller.equipAccessory('coffee');
+    expect(controller.getAccessory()).toBe('coffee');
+
+    controller.playEmote('dance');
+    expect(controller.getState().animState).toBe('dance');
+  });
+
+  it('simulates sports convertible car driving physics with realistic acceleration', () => {
+    const controller = new CharacterController(initialLng, initialLat);
+    controller.setMovementMode('car');
+    expect(controller.getMovementMode()).toBe('car');
+
+    controller.update(0.2, { x: 0, y: 1.0 }, 0);
+    const state = controller.getState();
+    expect(state.animState).toBe('driving');
+    expect(state.speedMps).toBeGreaterThan(0);
+  });
 });
