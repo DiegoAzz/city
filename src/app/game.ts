@@ -176,9 +176,7 @@ export class Game {
       this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
       this.camera = new CameraController(map, initialLng, initialLat);
-      if (prefs.cameraMode) {
-        this.camera.setMode(prefs.cameraMode);
-      }
+      this.camera.setMode(prefs.cameraMode || 'thirdPerson');
 
       // Start panoramic cinematic orbit during welcome screen
       this.camera.startCinematic();
@@ -348,7 +346,7 @@ export class Game {
     const charState = this.character.getState();
     if (this.camera) {
       this.camera.setTarget(currentLng, currentLat);
-      this.camera.update(deltaSeconds, charState.speedMps);
+      this.camera.update(deltaSeconds, charState.speedMps, this.character.getBearing());
     }
 
     // 4. Update Multiplayer & Chat synchronization
@@ -388,7 +386,7 @@ export class Game {
     const pos = this.character.getPosition();
     LocalStore.save({
       lastPosition: pos,
-      cameraMode: this.camera ? this.camera.getMode() : 'isometric',
+      cameraMode: this.camera ? this.camera.getMode() : 'thirdPerson',
       streamMode: this.presentationMode.isEnabled(),
       qualityProfile: this.qualityManager.getProfile().name
     });

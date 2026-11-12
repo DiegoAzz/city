@@ -1,11 +1,11 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { CAMERA_CONFIG } from '../app/config';
 
-export type CameraViewMode = 'isometric' | 'thirdPerson' | 'aerial';
+export type CameraViewMode = 'thirdPerson' | 'isometric' | 'aerial';
 
 export class CameraController {
   private map: MapLibreMap;
-  private mode: CameraViewMode = 'isometric';
+  private mode: CameraViewMode = 'thirdPerson';
   private targetLng: number;
   private targetLat: number;
   private currentLng: number;
@@ -25,8 +25,8 @@ export class CameraController {
     this.isCinematic = true;
     this.cinematicAngle = this.map.getBearing() || 30;
     this.map.easeTo({
-      pitch: 58,
-      zoom: 17.5,
+      pitch: 74,
+      zoom: 19.8,
       duration: 800
     });
   }
@@ -56,12 +56,12 @@ export class CameraController {
   }
 
   public cycleMode(): CameraViewMode {
-    if (this.mode === 'isometric') {
-      this.mode = 'thirdPerson';
-    } else if (this.mode === 'thirdPerson') {
+    if (this.mode === 'thirdPerson') {
+      this.mode = 'isometric';
+    } else if (this.mode === 'isometric') {
       this.mode = 'aerial';
     } else {
-      this.mode = 'isometric';
+      this.mode = 'thirdPerson';
     }
     this.applyModeSettings();
     return this.mode;
@@ -69,17 +69,17 @@ export class CameraController {
 
   public getModeLabel(): string {
     switch (this.mode) {
-      case 'isometric':
-        return 'ISO';
       case 'thirdPerson':
         return 'TPS';
+      case 'isometric':
+        return 'ISO';
       case 'aerial':
         return 'TOP';
     }
   }
 
   public zoomIn(delta: number = 0.4): void {
-    const nextZoom = Math.min(20.0, this.map.getZoom() + delta);
+    const nextZoom = Math.min(22.0, this.map.getZoom() + delta);
     this.map.easeTo({ zoom: nextZoom, duration: 160 });
   }
 
@@ -95,7 +95,7 @@ export class CameraController {
 
   public tiltBy(deltaPitch: number): void {
     const current = this.map.getPitch();
-    const newPitch = Math.max(10, Math.min(70, current + deltaPitch));
+    const newPitch = Math.max(10, Math.min(84, current + deltaPitch));
     this.map.setPitch(newPitch);
   }
 
@@ -114,12 +114,12 @@ export class CameraController {
 
   /**
    * Smoothly interpolates camera tracking. Adapts follow speed dynamically based on travel velocity
-   * so high-speed vehicles (moto/car) never run off-screen or hitch.
+   * and in Third-Person mode smoothly swings the camera behind player movement.
    */
-  public update(deltaSeconds: number, speedMps: number = 0): void {
-    const baseLerp = 0.12;
-    const speedBonus = Math.min(0.20, (speedMps / 40.0) * 0.15);
-    const lerpRate = Math.min(0.35, (baseLerp + speedBonus) * (deltaSeconds * 60.0));
+  public update(deltaSeconds: number, speedMps: number = 0, playerBearingDeg?: number): void {
+    const baseLerp = 0.14;
+    const speedBonus = Math.min(0.22, (speedMps / 40.0) * 0.18);
+    const lerpRate = Math.min(0.38, (baseLerp + speedBonus) * (deltaSeconds * 60.0));
 
     const dLng = this.targetLng - this.currentLng;
     const dLat = this.targetLat - this.currentLat;
@@ -128,6 +128,15 @@ export class CameraController {
       this.currentLng += dLng * lerpRate;
       this.currentLat += dLat * lerpRate;
       this.map.setCenter([this.currentLng, this.currentLat]);
+    }
+
+    // In third-person street mode, smoothly follow behind the avatar when moving
+    if (this.mode === 'thirdPerson' && playerBearingDeg !== undefined && speedMps > 1.2 && !this.isCinematic) {
+      let diff = playerBearingDeg - this.map.getBearing();
+      while (diff < -180) diff += 360;
+      while (diff > 180) diff -= 360;
+      const turnLerp = Math.min(0.18, deltaSeconds * 2.2);
+      this.map.setBearing((this.map.getBearing() + diff * turnLerp + 360) % 360);
     }
   }
 
@@ -145,20 +154,20 @@ export class CameraController {
 
   private applyModeSettings(): void {
     switch (this.mode) {
+      case 'thirdPerson':
+        // Close-up street action view (Roblox Brookhaven eye-level immersion)
+        this.map.easeTo({
+          pitch: 76,
+          zoom: 20.6,
+          duration: 600
+        });
+        break;
+
       case 'isometric':
         this.map.easeTo({
           pitch: CAMERA_CONFIG.isometricPitch,
           bearing: CAMERA_CONFIG.isometricBearing,
           zoom: 18.2,
-          duration: 600
-        });
-        break;
-
-      case 'thirdPerson':
-        // Close-up street action view - big character, street level immersion
-        this.map.easeTo({
-          pitch: 65,
-          zoom: 19.3,
           duration: 600
         });
         break;

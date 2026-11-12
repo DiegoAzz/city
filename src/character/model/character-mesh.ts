@@ -39,6 +39,7 @@ export function createCharacterMesh(): CharacterRigs {
 
   const container = new THREE.Group();
   container.name = 'character-container';
+  container.scale.set(1.85, 1.85, 1.85); // Roblox Brookhaven style: prominent, clearly visible avatar
   root.add(container);
 
   // --- Cartoon Palette with Soft Ambient Glow ---

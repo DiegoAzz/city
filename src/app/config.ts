@@ -22,8 +22,8 @@ export const CARTAGENA_CONFIG: CityConfig = {
   country: 'Colombia',
   // Plaza de Santo Domingo (Open historic plaza, wide outdoor space)
   initialCenter: [-75.55200, 10.42432],
-  initialZoom: 18.2,
-  initialPitch: 54, // Isometric tilt
+  initialZoom: 20.6, // Brookhaven style close-up street immersion
+  initialPitch: 75, // Eye-level third-person perspective looking ahead
   initialBearing: 30,
   bounds: {
     // Generously expanded bounds: covers Historic Center, Av. Santander, El Cabrero, Marbella, Manga, Getsemaní (~8 km²)
@@ -35,13 +35,13 @@ export const CARTAGENA_CONFIG: CityConfig = {
 };
 
 export const CAMERA_CONFIG = {
-  isometricPitch: 54,
+  isometricPitch: 58,
   isometricBearing: 30,
   aerialPitch: 0,
   aerialBearing: 0,
-  aerialZoom: 16.8,
-  minZoom: 14.5,
-  maxZoom: 20.0
+  aerialZoom: 17.0,
+  minZoom: 15.0,
+  maxZoom: 22.0
 };
 
 export const MAP_STYLES = {
