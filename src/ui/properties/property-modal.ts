@@ -41,6 +41,7 @@ export class PropertyModal {
     this.actionPill = document.createElement('div');
     this.actionPill.id = 'property-action-pill';
     this.actionPill.className = 'property-action-pill hidden';
+    this.actionPill.style.display = 'none';
     this.actionPill.innerHTML = `
       <span class="pill-house-icon">🏡</span>
       <div class="pill-info">
@@ -51,16 +52,17 @@ export class PropertyModal {
     `;
     document.getElementById('hud-container')?.appendChild(this.actionPill);
 
-    // 2. Brookhaven Property Claim & Customizer Modal
+    // 2. Property Claim & Customizer Modal
     this.modalOverlay = document.createElement('div');
     this.modalOverlay.id = 'property-modal-overlay';
     this.modalOverlay.className = 'property-modal-overlay hidden';
+    this.modalOverlay.style.display = 'none';
     this.modalOverlay.innerHTML = `
       <div class="property-modal-card">
         <div class="prop-modal-accent-bar"></div>
         <div class="prop-modal-header">
           <div class="prop-header-info">
-            <span class="prop-modal-badge">🏡 PROPIEDAD VIRTUAL REAL (OSM)</span>
+            <span class="prop-modal-badge">🏡 PROPIEDAD EXCLUSIVA</span>
             <h3 id="prop-modal-name" class="prop-modal-title">Casa Colonial</h3>
             <span id="prop-modal-district" class="prop-modal-district">Centro Histórico · Cartagena</span>
           </div>

@@ -196,14 +196,7 @@ export class Hud {
 
   public setVehicleMode(mode: MovementMode, force: boolean = false): void {
     if (mode === 'boat' && !this.canUseBoat && !force) {
-      this.showDialog({
-        category: 'Capitanía Marítima',
-        icon: '⚓',
-        title: '¡Estás lejos del agua!',
-        message: 'El barco y las lanchas solo se habilitan cuando llegas a la orilla del mar, muelle o bahía de Cartagena.',
-        secondaryAction: { text: 'Entendido' },
-        durationMs: 4500
-      });
+      this.showToast('⚓ El barco se habilita cuando te acercas al mar o la bahía', 3000);
       return;
     }
 

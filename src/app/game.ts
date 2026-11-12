@@ -74,13 +74,13 @@ export class Game {
     this.presentationMode = new PresentationMode();
     this.presentationMode.setStreamMode(false); // Always guarantee HUD and controls are visible
 
-    // Initialize Audio, Multiplayer & Economy systems
+    // Initialize Audio, Multiplayer & Economy systems (Clean Sandbox Mode)
     this.soundSystem = new SoundSystem();
     this.multiplayer = new MultiplayerManager(this.character);
     this.chatUi = new ChatUi(this.multiplayer);
     this.economy = new EconomyManager();
     this.propertyManager = new PropertyManager(this.economy, this.multiplayer);
-    this.propertyModal = new PropertyModal(this.propertyManager, this.soundSystem);
+    this.propertyModal = null; // In pure Sandbox mode, no blocking popups or property modals
 
     // Listen for multiplayer property synchronization
     this.multiplayer.onPropertyUpdated((prop) => {

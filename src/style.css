@@ -1823,9 +1823,19 @@ body, html, #app {
   font-family: monospace;
 }
 
+/* Global utility */
+.hidden {
+  display: none !important;
+}
+
 /* ==========================================================================
    FASE 4 & 5: SISTEMA DE PROPIEDADES VIRTUALES Y CASAS (THE FANTASTIC ONE)
    ========================================================================== */
+
+.property-action-pill.hidden,
+.property-modal-overlay.hidden {
+  display: none !important;
+}
 
 .property-action-pill {
   position: absolute;
