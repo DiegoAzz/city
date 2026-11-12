@@ -20,6 +20,8 @@ import { EconomyManager } from '../economy/economy-manager';
 import { PropertyManager } from '../properties/property-manager';
 import { PropertyModal } from '../ui/properties/property-modal';
 import { DecorationManager } from '../decorations/decoration-manager';
+import { RemodelManager } from '../remodel/remodel-manager';
+import { RemodelModal } from '../ui/remodel/remodel-modal';
 
 export class Game {
   private character: CharacterController;
@@ -41,6 +43,8 @@ export class Game {
   private propertyManager: PropertyManager;
   private propertyModal: PropertyModal | null = null;
   private decorationManager: DecorationManager;
+  private remodelManager: RemodelManager;
+  private remodelModal: RemodelModal | null = null;
 
   private isRunning: boolean = false;
   private lastFrameTime: number = performance.now();
@@ -84,6 +88,17 @@ export class Game {
     this.propertyManager = new PropertyManager(this.economy, this.multiplayer);
     this.propertyModal = null; // In pure Sandbox mode, no blocking popups or property modals
     this.decorationManager = new DecorationManager(this.economy, this.multiplayer);
+    this.remodelManager = new RemodelManager(this.economy, this.multiplayer);
+
+    // Passive income notification from remodeled landmarks
+    this.remodelManager.onRentIncome((total, count) => {
+      this.soundSystem.playHorn('bicycle');
+      this.hud?.showToast(`💰 ¡Recibiste +$${total} de ingresos pasivos por tus ${count} inmuebles!`, 4000);
+      const balanceEl = document.getElementById('player-balance-text');
+      if (balanceEl && this.economy) {
+        balanceEl.textContent = `$${this.economy.getBalance().toLocaleString()}`;
+      }
+    });
 
     // Listen for multiplayer property synchronization
     this.multiplayer.onPropertyUpdated((prop) => {
@@ -153,6 +168,30 @@ export class Game {
       // Connect multiplayer manager to Three.js custom layer
       this.mapManager.getThreeLayer()?.setMultiplayerManager(this.multiplayer);
       this.mapManager.getThreeLayer()?.setDecorationManager(this.decorationManager);
+      this.mapManager.getThreeLayer()?.setRemodelManager(this.remodelManager);
+
+      // Initialize Remodel Modal & Studio for existing architecture
+      this.remodelModal = new RemodelModal(this.remodelManager, this.soundSystem, this.mapManager);
+
+      // Interactive building tap on the 3D map!
+      this.mapManager.onBuildingClick((feature, lngLat) => {
+        const featId = feature?.id || `bldg_${Math.round((lngLat.lng + 75.55) * 100000)}_${Math.round((lngLat.lat - 10.42) * 100000)}`;
+        const height = feature?.properties?.render_height || feature?.properties?.height || 14;
+
+        let polygon: [number, number][] | undefined = undefined;
+        if (feature?.geometry?.type === 'Polygon' && feature.geometry.coordinates?.[0]) {
+          polygon = feature.geometry.coordinates[0];
+        }
+
+        this.remodelModal?.open({
+          id: String(featId),
+          lng: lngLat.lng,
+          lat: lngLat.lat,
+          height,
+          polygon,
+          titleHint: `🏛️ Edificación Colonial #${featId} · Toca para Remodelar`
+        });
+      });
 
       this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
@@ -175,7 +214,9 @@ export class Game {
         this.soundSystem,
         this.decorationManager,
         this.economy,
-        this.collisionSystem
+        this.collisionSystem,
+        this.remodelModal,
+        this.remodelManager
       );
 
       // Announce when another citizen joins the multiplayer room

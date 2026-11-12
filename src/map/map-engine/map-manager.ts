@@ -9,6 +9,7 @@ export class MapManager {
   private isLoaded: boolean = false;
   private onLoadCallbacks: Array<() => void> = [];
   private onErrorCallbacks: Array<(err: Error) => void> = [];
+  private onBuildingClickCallbacks: Array<(feature: any, lngLat: { lng: number; lat: number }) => void> = [];
 
   constructor(
     containerId: string,
@@ -127,13 +128,33 @@ export class MapManager {
         minzoom: 15,
         paint: {
           'fill-extrusion-color': [
-            'interpolate',
-            ['linear'],
-            ['coalesce', ['get', 'render_height'], ['get', 'height'], 8],
-            0, '#f1f5f9',
-            15, '#cbd5e1',
-            30, '#94a3b8'
+            'case',
+            // If customized via feature-state (Player remodeling)
+            ['boolean', ['feature-state', 'remodeled'], false],
+            ['to-color', ['feature-state', 'color']],
+
+            // Highrises in Bocagrande / Modern towers (> 28m)
+            ['>', ['coalesce', ['get', 'render_height'], ['get', 'height'], 8], 28],
+            '#94a3b8',
+
+            // Vibrant Cartagena Colonial Architectural Palette
+            [
+              'match',
+              [
+                '%',
+                ['to-number', ['round', ['*', ['coalesce', ['get', 'render_height'], ['get', 'height'], 6], 5]], 0],
+                6
+              ],
+              0, '#f59e0b', // Amarillo Colonial Cartagena (Convento / Plaza)
+              1, '#ea580c', // Terracota / Teja Colonial
+              2, '#f8fafc', // Blanco Estuco Encalado
+              3, '#0284c7', // Azul Celeste Caribeño
+              4, '#db2777', // Rosa Colonial Bougainvillea
+              5, '#10b981', // Verde Esmeralda Colonial
+              '#f59e0b'     // Default cálido
+            ]
           ],
+          'fill-extrusion-vertical-gradient': true,
           'fill-extrusion-height': [
             'interpolate',
             ['linear'],
@@ -148,7 +169,38 @@ export class MapManager {
             15, 0,
             15.05, ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0]
           ],
-          'fill-extrusion-opacity': 0.85
+          'fill-extrusion-opacity': 0.94
+        }
+      });
+
+      // GeoJSON source and layer for player-remodeled landmarks
+      this.map.addSource('remodeled-buildings-geojson', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+
+      this.map.addLayer({
+        id: 'remodeled-buildings-layer',
+        type: 'fill-extrusion',
+        source: 'remodeled-buildings-geojson',
+        minzoom: 13,
+        paint: {
+          'fill-extrusion-color': ['get', 'color'],
+          'fill-extrusion-height': ['get', 'height'],
+          'fill-extrusion-base': 0,
+          'fill-extrusion-vertical-gradient': true,
+          'fill-extrusion-opacity': 0.98
+        }
+      });
+
+      // Interactive Click to inspect & remodel existing buildings
+      this.map.on('click', '3d-buildings', (e) => {
+        if (e.features && e.features.length > 0) {
+          const feat = e.features[0];
+          this.onBuildingClickCallbacks.forEach((cb) => cb(feat, e.lngLat));
         }
       });
     } catch (e) {
@@ -200,6 +252,68 @@ export class MapManager {
 
   public getThreeLayer(): ThreeCharacterLayer | null {
     return this.threeLayer;
+  }
+
+  public onBuildingClick(callback: (feature: any, lngLat: { lng: number; lat: number }) => void): void {
+    this.onBuildingClickCallbacks.push(callback);
+  }
+
+  public setBuildingColor(featureId: string | number, color: string): void {
+    if (!this.map) return;
+    try {
+      const sourceId = this.map.getSource('openmaptiles') ? 'openmaptiles' : 'osm';
+      this.map.setFeatureState(
+        { source: sourceId, sourceLayer: 'building', id: featureId },
+        { remodeled: true, color }
+      );
+    } catch (e) {
+      console.warn('[MapManager] setFeatureState notice:', e);
+    }
+  }
+
+  public updateRemodeledGeoJSON(buildings: Array<{ id: string; name: string; color: string; lng: number; lat: number; height: number; polygon?: [number, number][] }>): void {
+    if (!this.map) return;
+    try {
+      const source = this.map.getSource('remodeled-buildings-geojson') as any;
+      if (!source) return;
+
+      const features = buildings.map((b) => {
+        // If polygon is provided, use it; otherwise create a neat 16x16m rectangular footprint centered at [lng, lat]
+        const dLng = 0.00014;
+        const dLat = 0.00012;
+        const coordinates = b.polygon && b.polygon.length >= 3 ? [b.polygon] : [
+          [
+            [b.lng - dLng, b.lat - dLat],
+            [b.lng + dLng, b.lat - dLat],
+            [b.lng + dLng, b.lat + dLat],
+            [b.lng - dLng, b.lat + dLat],
+            [b.lng - dLng, b.lat - dLat]
+          ]
+        ];
+
+        return {
+          type: 'Feature',
+          id: b.id,
+          properties: {
+            id: b.id,
+            name: b.name,
+            color: b.color,
+            height: b.height || 14
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates
+          }
+        };
+      });
+
+      source.setData({
+        type: 'FeatureCollection',
+        features
+      });
+    } catch (e) {
+      console.warn('[MapManager] updateRemodeledGeoJSON notice:', e);
+    }
   }
 
   public onReady(callback: () => void): void {

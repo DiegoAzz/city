@@ -2528,3 +2528,256 @@ body, html, #app {
   transform: scale(0.97);
 }
 
+/* ==========================================================================
+   FASE 7: ESTUDIO DE REMODELACIÓN COLONIAL (THE FANTASTIC ONE)
+   ========================================================================== */
+
+.remodel-btn-glow {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.4) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
+}
+
+.remodel-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  background: rgba(2, 6, 23, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  animation: fadeInModal 0.22s ease forwards;
+}
+
+.remodel-modal-card {
+  position: relative;
+  width: 92vw;
+  max-width: 520px;
+  max-height: 88vh;
+  background: #0f172a;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(245, 158, 11, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleInModal 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.remodel-accent-bar {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #f59e0b, #ea580c, #0284c7, #10b981);
+}
+
+.remodel-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.remodel-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #f59e0b;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.remodel-modal-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.remodel-target-info {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+  margin-top: 2px;
+}
+
+.remodel-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.remodel-close-btn:active {
+  background: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+}
+
+.remodel-modal-body {
+  padding: 12px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(88vh - 140px);
+}
+
+.remodel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.remodel-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.remodel-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.remodel-preset-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.remodel-preset-card.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+
+.remodel-preset-card:active {
+  transform: scale(0.97);
+}
+
+.preset-card-icon {
+  font-size: 1.45rem;
+  flex-shrink: 0;
+}
+
+.preset-card-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preset-card-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-card-income {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.preset-card-cost {
+  font-size: 0.64rem;
+  color: #94a3b8;
+}
+
+.remodel-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.remodel-input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.remodel-colors-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.remodel-color-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.remodel-color-btn.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 16px rgba(245, 158, 11, 0.6);
+  transform: scale(1.15);
+}
+
+.remodel-color-btn:active {
+  transform: scale(0.95);
+}
+
+.remodel-modal-footer {
+  padding: 10px 18px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-remodel-confirm {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: 1px solid rgba(251, 191, 36, 0.8);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+  transition: transform 0.1s ease;
+}
+
+.btn-remodel-confirm:active {
+  transform: scale(0.97);
+}
+
+

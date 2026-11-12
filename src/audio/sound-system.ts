@@ -216,6 +216,28 @@ export class SoundSystem {
     } catch {}
   }
 
+  public playRemodelSuccess(): void {
+    if (this.isMuted || !this.ctx || this.ctx.state === 'suspended') return;
+    try {
+      const t = this.ctx.currentTime;
+      // Majestic Spanish colonial fanfare chord progression: F4, A4, C5, F5, A5
+      const notes = [349.23, 440.0, 523.25, 698.46, 880.0];
+      notes.forEach((freq, idx) => {
+        const delay = idx * 0.08;
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + delay);
+        gain.gain.setValueAtTime(0.38, t + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.45);
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.48);
+      });
+    } catch {}
+  }
+
   public playDemolish(): void {
     if (this.isMuted || !this.ctx || this.ctx.state === 'suspended') return;
     try {

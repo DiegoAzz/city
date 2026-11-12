@@ -4,6 +4,8 @@ import { CharacterController } from '../../character/controller/character-contro
 import type { MultiplayerManager } from '../../multiplayer/multiplayer-manager';
 import type { DecorationManager } from '../../decorations/decoration-manager';
 import { AmbientCitizensManager } from '../../citizens/ambient-citizens';
+import type { RemodelManager } from '../../remodel/remodel-manager';
+import { RemodelSignRenderer } from '../../remodel/remodel-sign-renderer';
 
 export class ThreeCharacterLayer implements CustomLayerInterface {
   public id: string = 'three-character-layer';
@@ -17,14 +19,16 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   private characterController: CharacterController;
   private multiplayerManager: MultiplayerManager | null = null;
   private decorationManager: DecorationManager | null = null;
+  private remodelManager: RemodelManager | null = null;
+  private remodelSignRenderer: RemodelSignRenderer;
   private ambientCitizens: AmbientCitizensManager;
   private lastTime: number = performance.now();
 
   constructor(characterController: CharacterController) {
     this.characterController = characterController;
     this.camera = new THREE.Camera();
-
     this.scene = new THREE.Scene();
+    this.remodelSignRenderer = new RemodelSignRenderer();
 
     // Vibrant cartoon lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.6);
@@ -61,6 +65,15 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   public setDecorationManager(decorationManager: DecorationManager): void {
     this.decorationManager = decorationManager;
     this.decorationManager.setScene(this.scene);
+  }
+
+  public setRemodelManager(remodelManager: RemodelManager): void {
+    this.remodelManager = remodelManager;
+    this.remodelSignRenderer.setScene(this.scene);
+    this.remodelSignRenderer.updateBuildingSigns(this.remodelManager.getAllRemodeled());
+    this.remodelManager.onRemodel(() => {
+      this.remodelSignRenderer.updateBuildingSigns(this.remodelManager!.getAllRemodeled());
+    });
   }
 
   public onAdd(map: MapLibreMap, gl: WebGLRenderingContext | WebGL2RenderingContext): void {
@@ -132,6 +145,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     // Update 3D decoration positions
     this.decorationManager?.updatePositions(lng, lat);
+
+    // Update 3D remodeled building signs
+    this.remodelSignRenderer.updatePositions(lng, lat);
 
     this.camera.projectionMatrix = m.multiply(l);
     this.renderer.resetState();

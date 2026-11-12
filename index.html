@@ -234,6 +234,14 @@
 
       <!-- Roblox Style Right Edge Menu Strip (Collapsible Dock) -->
       <aside class="roblox-dock-right" aria-label="Menú lateral de acciones">
+        <!-- 0. Remodelar Edificaciones Existentes (Centro de Convenciones, Hoteles, Restaurantes) -->
+        <div class="dock-item-wrapper">
+          <button id="btn-dock-remodel" class="roblox-dock-btn remodel-btn-glow" aria-label="Remodelar Edificios" title="Remodelar Edificio Existente">
+            <span class="dock-icon">🏛️</span>
+            <span class="dock-label">Remodelar</span>
+          </button>
+        </div>
+
         <!-- 1. Construir Inmuebles & Casas Button & Studio Drawer -->
         <div class="dock-item-wrapper">
           <button id="btn-dock-build" class="roblox-dock-btn build-btn-glow" aria-label="Construir Inmuebles" title="Construir Casas y Muebles">
@@ -511,6 +519,10 @@
           <button id="btn-menu-close" class="drawer-close-btn" type="button">✕</button>
         </div>
         <div class="drawer-actions-grid">
+          <button id="btn-menu-remodel" class="drawer-action-btn remodel-btn-glow">
+            <span class="action-icon">🏛️</span>
+            <span class="action-text">Remodelar</span>
+          </button>
           <button id="btn-sound" class="drawer-action-btn">
             <span id="sound-icon" class="action-icon">🔊</span>
             <span class="action-text">Sonido</span>

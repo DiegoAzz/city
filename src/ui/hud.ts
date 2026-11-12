@@ -10,6 +10,8 @@ import { DECORATION_CATALOG } from '../decorations/decoration-manager';
 import type { EconomyManager } from '../economy/economy-manager';
 import type { CollisionSystem } from '../navigation/collision-system';
 import { metersToDeltaDegrees } from '../map/projection/mercator';
+import type { RemodelModal } from './remodel/remodel-modal';
+import type { RemodelManager } from '../remodel/remodel-manager';
 
 export class Hud {
   private btnCamera: HTMLElement | null = null;
@@ -41,7 +43,9 @@ export class Hud {
     private soundSystem: SoundSystem,
     private decorationManager?: DecorationManager,
     private economy?: EconomyManager,
-    private collisionSystem?: CollisionSystem
+    private collisionSystem?: CollisionSystem,
+    private remodelModal?: RemodelModal,
+    private remodelManager?: RemodelManager
   ) {
     this.gameDialog = new GameDialog();
     this.btnCamera = document.getElementById('btn-camera');
@@ -202,6 +206,33 @@ export class Hud {
         el.classList.add('hidden');
       }
     };
+
+    // Remodel dock & menu buttons (🏛️ Remodelar Edificio)
+    const btnDockRemodel = document.getElementById('btn-dock-remodel');
+    const btnMenuRemodel = document.getElementById('btn-menu-remodel');
+
+    const handleOpenRemodel = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      [flyoutBuild, flyoutVehicles, flyoutCamera, flyoutMenu].forEach((f) => f?.classList.add('hidden'));
+
+      if (this.remodelModal) {
+        const [pLng, pLat] = this.characterController.getPosition();
+        this.remodelModal.open({
+          id: `remodel_bldg_${Math.round((pLng + 75.55) * 100000)}_${Math.round((pLat - 10.42) * 100000)}`,
+          lng: pLng + 0.00012,
+          lat: pLat + 0.00010,
+          height: 14,
+          titleHint: '🏛️ Edificación Colonial · Plaza Santo Domingo'
+        });
+      }
+    };
+
+    btnDockRemodel?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnDockRemodel?.addEventListener('click', handleOpenRemodel);
+
+    btnMenuRemodel?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnMenuRemodel?.addEventListener('click', handleOpenRemodel);
 
     // Construction dock button
     btnBuild?.addEventListener('pointerdown', (e) => e.stopPropagation());
@@ -459,5 +490,13 @@ export class Hud {
       this.toastEl?.classList.add('hidden');
       this.toastTimer = null;
     }, durationMs);
+  }
+
+  public getRemodelManager(): RemodelManager | undefined {
+    return this.remodelManager;
+  }
+
+  public getRemodelModal(): RemodelModal | undefined {
+    return this.remodelModal;
   }
 }
