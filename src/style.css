@@ -265,13 +265,12 @@ html, body {
 .roblox-dock-right {
   position: absolute;
   right: calc(env(safe-area-inset-right) + 12px);
-  top: 48%;
-  transform: translateY(-50%);
+  top: calc(env(safe-area-inset-top) + 52px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-end;
-  z-index: 100;
+  z-index: 1000;
   pointer-events: auto;
 }
 
@@ -425,17 +424,16 @@ html, body {
   right: calc(env(safe-area-inset-right) + 16px);
   bottom: calc(env(safe-area-inset-bottom) + 16px);
   display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  z-index: 100;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
   pointer-events: auto;
 }
 
 .roblox-sub-actions {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 2px;
+  align-items: center;
+  gap: 8px;
 }
 
 .roblox-btn-circle {

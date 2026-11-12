@@ -175,44 +175,57 @@ export class Hud {
   private bindRobloxFlyouts(): void {
     const btnVehicle = document.getElementById('btn-dock-vehicle');
     const flyoutVehicles = document.getElementById('flyout-vehicles');
-    btnVehicle?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      flyoutVehicles?.classList.toggle('hidden');
-      document.getElementById('flyout-camera')?.classList.add('hidden');
-      document.getElementById('flyout-main-menu')?.classList.add('hidden');
-    });
-
     const btnCamera = document.getElementById('btn-dock-camera');
     const flyoutCamera = document.getElementById('flyout-camera');
-    btnCamera?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      flyoutCamera?.classList.toggle('hidden');
-      flyoutVehicles?.classList.add('hidden');
-      document.getElementById('flyout-main-menu')?.classList.add('hidden');
-    });
-
     const btnMenu = document.getElementById('btn-roblox-menu');
     const flyoutMenu = document.getElementById('flyout-main-menu');
-    btnMenu?.addEventListener('click', (e) => {
+    const btnMenuClose = document.getElementById('btn-menu-close');
+
+    const toggleFlyout = (el: HTMLElement | null, others: (HTMLElement | null)[]) => {
+      if (!el) return;
+      const isCurrentlyHidden = el.classList.contains('hidden');
+      others.forEach((o) => o?.classList.add('hidden'));
+      if (isCurrentlyHidden) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    };
+
+    // Vehicle dock button
+    btnVehicle?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnVehicle?.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
-      flyoutMenu?.classList.toggle('hidden');
-      flyoutVehicles?.classList.add('hidden');
-      flyoutCamera?.classList.add('hidden');
+      toggleFlyout(flyoutVehicles, [flyoutCamera, flyoutMenu]);
     });
 
-    const btnMenuClose = document.getElementById('btn-menu-close');
-    btnMenuClose?.addEventListener('click', () => {
+    // Camera dock button
+    btnCamera?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnCamera?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFlyout(flyoutCamera, [flyoutVehicles, flyoutMenu]);
+    });
+
+    // Main Roblox Menu (☰)
+    btnMenu?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnMenu?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFlyout(flyoutMenu, [flyoutVehicles, flyoutCamera]);
+    });
+
+    btnMenuClose?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       flyoutMenu?.classList.add('hidden');
     });
 
-    // Close flyouts on touch anywhere on map
-    document.addEventListener('pointerdown', (e) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.roblox-dock-right') && !target.closest('.roblox-menu-drawer') && !target.closest('#btn-roblox-menu')) {
-        flyoutVehicles?.classList.add('hidden');
-        flyoutCamera?.classList.add('hidden');
-        flyoutMenu?.classList.add('hidden');
-      }
+    // Prevent touches inside flyouts from closing them
+    [flyoutVehicles, flyoutCamera, flyoutMenu].forEach((f) => {
+      f?.addEventListener('pointerdown', (e) => e.stopPropagation());
+      f?.addEventListener('click', (e) => e.stopPropagation());
     });
   }
 
