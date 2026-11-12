@@ -2855,4 +2855,268 @@ body, html, #app {
   }
 }
 
+/* ==========================================================================
+   FASE 9: MODAL DE DESTINOS Y TELETRANSPORTE GPS (CARTAGENA 3D)
+   ========================================================================== */
+
+.fast-travel-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInModal 0.22s ease-out;
+}
+
+.fast-travel-dialog-card {
+  position: relative;
+  width: 94vw;
+  max-width: 640px;
+  max-height: 90vh;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.travel-accent-bar {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #38bdf8, #0284c7, #f59e0b, #ea580c, #ec4899);
+}
+
+.travel-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.travel-top-chip {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.travel-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 2px 0 0;
+}
+
+.travel-modal-subtitle {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin: 2px 0 0;
+}
+
+.travel-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.travel-close-btn:active {
+  background: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
+}
+
+.travel-quick-bar {
+  padding: 8px 18px 4px;
+}
+
+.quick-recenter-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  color: #fef3c7;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  transition: all 0.15s ease;
+}
+
+.quick-recenter-btn:active {
+  transform: scale(0.98);
+  background: rgba(245, 158, 11, 0.45);
+}
+
+.travel-filter-pills {
+  display: flex;
+  gap: 6px;
+  padding: 6px 18px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.travel-filter-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.travel-filter-btn {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.travel-filter-btn.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.travel-modal-body {
+  padding: 8px 18px 16px;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 580px) {
+  .dest-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dest-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  transition: all 0.15s ease;
+}
+
+.dest-card:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.dest-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dest-card-badge {
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+.dest-card-titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dest-card-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dest-card-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dest-card-desc {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.dest-card-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.dest-feature-pill {
+  font-size: 0.60rem;
+  font-weight: 700;
+  color: #fde047;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.dest-card-travel-btn {
+  margin-top: 4px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
+  transition: all 0.15s ease;
+}
+
+.dest-card-travel-btn:active {
+  transform: scale(0.97);
+  background: #0284c7;
+}
+
+
 

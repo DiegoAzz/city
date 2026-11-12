@@ -120,6 +120,27 @@ export class CharacterController {
     this.lat = cLat;
   }
 
+  public setBearing(bearingDeg: number): void {
+    this.bearingDeg = (bearingDeg + 360) % 360;
+    this.rigs.root.rotation.y = (this.bearingDeg * Math.PI) / 180.0;
+  }
+
+  public teleport(lng: number, lat: number, bearingDeg?: number): void {
+    this.setPosition(lng, lat);
+    if (bearingDeg !== undefined) {
+      this.setBearing(bearingDeg);
+    }
+    this.currentSpeedMps = 0;
+    this.verticalVelocity = 0;
+    this.verticalPosition = 0;
+    this.isGrounded = true;
+    this.rigs.container.position.y = 0;
+    if (this.movementMode === 'car') {
+      const facingRad = (this.bearingDeg * Math.PI) / 180.0;
+      this.carPhysics.reset(facingRad);
+    }
+  }
+
   public getState(): CharacterState {
     return {
       lng: this.lng,

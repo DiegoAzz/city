@@ -137,20 +137,32 @@ export class MapManager {
             ['>', ['coalesce', ['get', 'render_height'], ['get', 'height'], 8], 28],
             '#94a3b8',
 
-            // Vibrant Cartagena Colonial Architectural Palette
+            // Vibrant Cartagena Colonial Architectural Palette (Distributed across distinct buildings)
             [
               'match',
               [
                 '%',
-                ['to-number', ['round', ['*', ['coalesce', ['get', 'render_height'], ['get', 'height'], 6], 5]], 0],
-                6
+                [
+                  'to-number',
+                  [
+                    'coalesce',
+                    ['id'],
+                    ['get', 'osm_id'],
+                    ['get', 'id'],
+                    ['round', ['*', ['coalesce', ['get', 'render_height'], ['get', 'height'], 7], 19]],
+                    3
+                  ],
+                  0
+                ],
+                7
               ],
-              0, '#f59e0b', // Amarillo Colonial Cartagena (Convento / Plaza)
-              1, '#ea580c', // Terracota / Teja Colonial
-              2, '#f8fafc', // Blanco Estuco Encalado
-              3, '#0284c7', // Azul Celeste Caribeño
-              4, '#db2777', // Rosa Colonial Bougainvillea
+              0, '#f59e0b', // Amarillo Colonial Cartagena (Plaza & Claustros)
+              1, '#ea580c', // Terracota Cálido
+              2, '#fef08a', // Crema Colonial Pastel
+              3, '#0284c7', // Azul Caribeño
+              4, '#db2777', // Rosa Bougainvillea Colonial
               5, '#10b981', // Verde Esmeralda Colonial
+              6, '#f8fafc', // Blanco Estuco Encalado
               '#f59e0b'     // Default cálido
             ]
           ],

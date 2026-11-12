@@ -26,11 +26,11 @@ export const CARTAGENA_CONFIG: CityConfig = {
   initialPitch: 75, // Eye-level third-person perspective looking ahead
   initialBearing: 30,
   bounds: {
-    // Generously expanded bounds: covers Historic Center, Av. Santander, El Cabrero, Marbella, Manga, Getsemaní (~8 km²)
-    minLng: -75.5680,
-    minLat: 10.4020,
-    maxLng: -75.5280,
-    maxLat: 10.4480
+    // Generously expanded bounds: covers Historic Center, Bocagrande, El Laguito, Av. Santander, El Cabrero, Marbella, Manga, Getsemaní, Popa (~25 km²)
+    minLng: -75.5800,
+    minLat: 10.3800,
+    maxLng: -75.5100,
+    maxLat: 10.4600
   }
 };
 

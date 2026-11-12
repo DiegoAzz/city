@@ -71,7 +71,7 @@ describe('Geographic Projection & Metrics', () => {
 
     // Clamping an out-of-bounds point pulls it to the boundary
     const [cLng, cLat] = clampToCartagenaBounds(-76.0, 11.0);
-    expect(cLng).toBe(-75.5680);
-    expect(cLat).toBe(10.4480);
+    expect(cLng).toBe(-75.5800);
+    expect(cLat).toBe(10.4600);
   });
 });

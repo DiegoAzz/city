@@ -75,6 +75,54 @@ export const CARTAGENA_LANDMARKS: CartagenaLandmarkDef[] = [
     description: 'Estatua de bronce de la heroína indígena sobre su pedestal en Puerto Duro.',
     badgeEmoji: '🗿',
     interactionPrompt: 'Admirar el emblema de la valentía e historia de Cartagena'
+  },
+  {
+    id: 'castillo_san_felipe',
+    name: 'Castillo San Felipe de Barajas',
+    shortTitle: 'Castillo San Felipe',
+    category: 'fortress',
+    lng: -75.53920,
+    lat: 10.42250,
+    headingDeg: 90,
+    description: 'La colosal fortaleza sobre el cerro San Lázaro, baluartes y cañones coloniales.',
+    badgeEmoji: '🏰',
+    interactionPrompt: 'Recorrer las murallas del Castillo San Felipe'
+  },
+  {
+    id: 'zapatos_viejos',
+    name: 'Monumento a Los Zapatos Viejos',
+    shortTitle: 'Zapatos Viejos',
+    category: 'monument',
+    lng: -75.53850,
+    lat: 10.42200,
+    headingDeg: 60,
+    description: 'Escultura icónica de botas de bronce en honor al poeta Luis Carlos López.',
+    badgeEmoji: '👞',
+    interactionPrompt: 'Tomarte una foto dentro de las botas gigantes'
+  },
+  {
+    id: 'muelle_pegasos',
+    name: 'Muelle de los Pegasos & Bahía de las Ánimas',
+    shortTitle: 'Muelle de los Pegasos',
+    category: 'monument',
+    lng: -75.54750,
+    lat: 10.42180,
+    headingDeg: 330,
+    description: 'Paseo marítimo con los dos corceles alados de mármol frente a la bahía.',
+    badgeEmoji: '⛵',
+    interactionPrompt: 'Pasear por el muelle y contemplar los veleros'
+  },
+  {
+    id: 'callejon_sombrillas',
+    name: 'Getsemaní & Callejón de las Sombrillas',
+    shortTitle: 'Callejón Sombrillas',
+    category: 'monument',
+    lng: -75.54680,
+    lat: 10.42080,
+    headingDeg: 45,
+    description: 'Techo multicolor de sombrillas flotantes, fachadas coloniales y arte bohemio.',
+    badgeEmoji: '🎨',
+    interactionPrompt: 'Pasear bajo el cielo de sombrillas de colores'
   }
 ];
 
@@ -116,6 +164,18 @@ export class CartagenaLandmarksManager {
         case 'palenquera_fruits':
           group = LandmarkModels.buildPalenqueraFruitStand();
           break;
+        case 'castillo_san_felipe':
+          group = LandmarkModels.buildCastilloSanFelipe();
+          break;
+        case 'zapatos_viejos':
+          group = LandmarkModels.buildZapatosViejos();
+          break;
+        case 'muelle_pegasos':
+          group = LandmarkModels.buildMuellePegasos();
+          break;
+        case 'callejon_sombrillas':
+          group = LandmarkModels.buildCallejonSombrillas();
+          break;
       }
 
       if (group) {
@@ -145,10 +205,11 @@ export class CartagenaLandmarksManager {
         const dEastMeters = dLng * metersPerDegLng;
         const dNorthMeters = dLat * metersPerDegLat;
 
+        // Position relative to player in Three.js coordinate system (/ 3.8 visual scale)
         mesh.position.set(
-          dEastMeters * visualScaleFactor,
+          dEastMeters / visualScaleFactor,
           0,
-          -dNorthMeters * visualScaleFactor
+          -dNorthMeters / visualScaleFactor
         );
 
         const dist = distanceInMeters([playerLng, playerLat], [def.lng, def.lat]);

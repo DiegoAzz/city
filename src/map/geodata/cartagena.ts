@@ -11,10 +11,10 @@ export interface Landmark {
 }
 
 export const CARTAGENA_BOUNDS = {
-  minLng: -75.5680,
-  minLat: 10.4020,
-  maxLng: -75.5280,
-  maxLat: 10.4480
+  minLng: -75.5800,
+  minLat: 10.3800,
+  maxLng: -75.5100,
+  maxLat: 10.4600
 };
 
 export const CARTAGENA_LANDMARKS: Landmark[] = [

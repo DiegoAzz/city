@@ -22,6 +22,9 @@ import { PropertyModal } from '../ui/properties/property-modal';
 import { DecorationManager } from '../decorations/decoration-manager';
 import { RemodelManager } from '../remodel/remodel-manager';
 import { RemodelModal } from '../ui/remodel/remodel-modal';
+import { FastTravelManager } from '../navigation/fast-travel';
+import { FastTravelModal } from '../ui/navigation/fast-travel-modal';
+import { distanceInMeters } from '../map/projection/mercator';
 
 export class Game {
   private character: CharacterController;
@@ -45,6 +48,8 @@ export class Game {
   private decorationManager: DecorationManager;
   private remodelManager: RemodelManager;
   private remodelModal: RemodelModal | null = null;
+  private fastTravelManager: FastTravelManager | null = null;
+  private fastTravelModal: FastTravelModal | null = null;
 
   private isRunning: boolean = false;
   private lastFrameTime: number = performance.now();
@@ -67,7 +72,7 @@ export class Game {
     if (
       prefs.lastPosition &&
       isWithinCartagenaBounds(prefs.lastPosition[0], prefs.lastPosition[1]) &&
-      Math.abs(prefs.lastPosition[1] - 10.4233) > 0.0005 // Discard old buggy coordinate inside building wall
+      distanceInMeters(prefs.lastPosition, CARTAGENA_CONFIG.initialCenter) < 450
     ) {
       initialLng = prefs.lastPosition[0];
       initialLat = prefs.lastPosition[1];
@@ -187,6 +192,14 @@ export class Game {
       this.camera = new CameraController(map, initialLng, initialLat);
       this.camera.setMode(prefs.cameraMode || 'thirdPerson');
 
+      // Initialize Cartagena GPS Fast Travel System
+      this.fastTravelManager = new FastTravelManager(this.character, this.camera, this.soundSystem);
+      this.fastTravelModal = new FastTravelModal(
+        this.fastTravelManager,
+        this.soundSystem,
+        (msg) => this.hud?.showToast(msg)
+      );
+
       // Start panoramic cinematic orbit during welcome screen
       this.camera.startCinematic();
 
@@ -203,7 +216,8 @@ export class Game {
         this.economy,
         this.collisionSystem,
         this.remodelModal,
-        this.remodelManager
+        this.remodelManager,
+        this.fastTravelModal
       );
 
       // Announce when another citizen joins the multiplayer room
@@ -246,9 +260,12 @@ export class Game {
   private handlePlay(): void {
     if (this.camera) {
       this.camera.stopCinematic();
+      this.camera.setMode('thirdPerson');
+      const [lng, lat] = this.character.getPosition();
+      this.camera.teleport(lng, lat, 30, 76, 20.6);
     }
     this.soundSystem.playHorn('bicycle');
-    this.hud?.showToast('🏙️ ¡Bienvenido a THE FANTASTIC ONE! Explora libremente.');
+    this.hud?.showToast('🏙️ ¡Bienvenido a THE FANTASTIC ONE! Toca 🗺️ Destinos para viajar por Cartagena.', 4500);
   }
 
   public getIntro(): IntroManager {

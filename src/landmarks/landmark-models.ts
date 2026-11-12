@@ -525,4 +525,285 @@ export class LandmarkModels {
     sprite.position.set(0, heightY, 0);
     return sprite;
   }
+
+  /**
+   * 7. Castillo San Felipe de Barajas (Colosal fortaleza militar sobre cerro)
+   */
+  public static buildCastilloSanFelipe(): THREE.Group {
+    const group = new THREE.Group();
+    const stoneWall = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+    const darkStone = new THREE.MeshLambertMaterial({ color: 0x64748b });
+
+    // Lower bastion tier
+    const baseTier = new THREE.Mesh(new THREE.BoxGeometry(9.0, 1.8, 7.0), stoneWall);
+    baseTier.position.y = 0.9;
+    group.add(baseTier);
+
+    // Mid terrace
+    const midTier = new THREE.Mesh(new THREE.BoxGeometry(6.5, 1.6, 5.0), darkStone);
+    midTier.position.set(-0.4, 2.6, -0.4);
+    group.add(midTier);
+
+    // High fortification command post
+    const topTier = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.4, 3.2), stoneWall);
+    topTier.position.set(-0.8, 4.1, -0.8);
+    group.add(topTier);
+
+    // Sentry watchtowers (Garitas coloniales) at corners
+    const sentryCorners = [
+      [-4.2, 1.8, 3.2],
+      [4.2, 1.8, 3.2],
+      [-4.2, 1.8, -3.2],
+      [4.2, 1.8, -3.2],
+      [-2.6, 4.8, 1.4]
+    ];
+    sentryCorners.forEach(([x, y, z]) => {
+      const sentry = new THREE.Group();
+      sentry.position.set(x, y, z);
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.1, 8), stoneWall);
+      post.position.y = 0.55;
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2), LandmarkModels.colonialYellow);
+      dome.position.y = 1.1;
+      sentry.add(post, dome);
+      group.add(sentry);
+    });
+
+    // Colonial Cannons along ramparts
+    [-2.2, 0, 2.2].forEach((x) => {
+      const cannon = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.20, 1.1, 8), LandmarkModels.castIron);
+      cannon.position.set(x, 2.05, 3.2);
+      cannon.rotation.x = Math.PI / 2 - 0.15;
+      group.add(cannon);
+    });
+
+    // Tall Flagpole with Colombian Flag
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 5.5, 8), LandmarkModels.stonePedestal);
+    pole.position.set(-1.8, 6.8, -1.8);
+    group.add(pole);
+
+    const flagY = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.02), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+    flagY.position.set(-1.0, 8.8, -1.8);
+    const flagB = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.22, 0.02), new THREE.MeshBasicMaterial({ color: 0x2563eb }));
+    flagB.position.set(-1.0, 8.46, -1.8);
+    const flagR = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.22, 0.02), new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
+    flagR.position.set(-1.0, 8.24, -1.8);
+    group.add(flagY, flagB, flagR);
+
+    // Title Billboard
+    const billboard = LandmarkModels.createTitleBillboard(
+      '🏰 Castillo San Felipe de Barajas',
+      'La Colosal Fortaleza Española sobre el Cerro San Lázaro',
+      9.8
+    );
+    group.add(billboard);
+
+    return group;
+  }
+
+  /**
+   * 8. Monumento a Los Zapatos Viejos (Botas gigantes de bronce)
+   */
+  public static buildZapatosViejos(): THREE.Group {
+    const group = new THREE.Group();
+
+    // Round paved stone plaza
+    const plaza = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.8, 0.3, 16), LandmarkModels.stonePedestal);
+    plaza.position.y = 0.15;
+    group.add(plaza);
+
+    // Stone pedestal
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.6, 2.2), LandmarkModels.stonePedestal);
+    plinth.position.y = 0.6;
+    group.add(plinth);
+
+    // Bronze Commemorative Plaque
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.04), LandmarkModels.goldMaterial);
+    plaque.position.set(0, 0.6, 1.12);
+    group.add(plaque);
+
+    // Two Giant Sculpted Old Bronze Boots
+    const createBoot = (isLeft: boolean): THREE.Group => {
+      const boot = new THREE.Group();
+      // Sole
+      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.25, 1.8), LandmarkModels.castIron);
+      sole.position.set(0, 0.12, 0.2);
+      // Main foot body
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.7, 1.3), LandmarkModels.bronzeMaterial);
+      foot.position.set(0, 0.55, 0.35);
+      // Rounded toe cap
+      const toe = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 8), LandmarkModels.bronzeMaterial);
+      toe.position.set(0, 0.45, 0.95);
+      // Boot ankle shaft
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, 1.2, 10), LandmarkModels.bronzeMaterial);
+      shaft.position.set(0, 1.3, -0.1);
+      shaft.rotation.x = 0.12;
+      // Slouched open boot cuff
+      const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.14, 8, 12), LandmarkModels.bronzeMaterial);
+      cuff.position.set(0, 1.85, -0.18);
+      cuff.rotation.x = Math.PI / 2;
+      boot.add(sole, foot, toe, shaft, cuff);
+      boot.rotation.y = isLeft ? 0.22 : -0.22;
+      return boot;
+    };
+
+    const leftBoot = createBoot(true);
+    leftBoot.position.set(-0.7, 0.9, 0);
+    const rightBoot = createBoot(false);
+    rightBoot.position.set(0.7, 0.9, 0);
+    group.add(leftBoot, rightBoot);
+
+    const billboard = LandmarkModels.createTitleBillboard(
+      '👞 Los Zapatos Viejos',
+      'Homenaje al Poeta Cartagenero Luis Carlos López',
+      3.8
+    );
+    group.add(billboard);
+
+    return group;
+  }
+
+  /**
+   * 9. Muelle de los Pegasos & Bahía de las Ánimas
+   */
+  public static buildMuellePegasos(): THREE.Group {
+    const group = new THREE.Group();
+
+    // Stone pier platform
+    const pier = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.5, 3.2), LandmarkModels.stonePedestal);
+    pier.position.y = 0.25;
+    group.add(pier);
+
+    // Iron nautical bollards
+    [-2.8, -1.0, 1.0, 2.8].forEach((x) => {
+      const bollard = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.5, 8), LandmarkModels.castIron);
+      bollard.position.set(x, 0.75, 1.35);
+      group.add(bollard);
+    });
+
+    // Twin Neoclassical Pedestals with Flying Pegasos
+    [-1.6, 1.6].forEach((x, idx) => {
+      const ped = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 1.2), LandmarkModels.whitePlaster);
+      ped.position.set(x, 1.6, 0);
+      group.add(ped);
+
+      // Gold cornice
+      const cornice = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.2, 1.35), LandmarkModels.goldMaterial);
+      cornice.position.set(x, 2.75, 0);
+      group.add(cornice);
+
+      // Rearing Pegasus Statue (Bronze & Gold finish)
+      const pegasus = new THREE.Group();
+      pegasus.position.set(x, 2.85, 0);
+      pegasus.rotation.y = idx === 0 ? 0.35 : -0.35;
+
+      // Horse body tilted back rearing
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.7, 1.2), LandmarkModels.goldMaterial);
+      body.position.set(0, 0.7, 0);
+      body.rotation.x = -0.45;
+
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 0.4), LandmarkModels.goldMaterial);
+      neck.position.set(0, 1.25, 0.45);
+      neck.rotation.x = 0.35;
+
+      const horseHead = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.4, 0.65), LandmarkModels.goldMaterial);
+      horseHead.position.set(0, 1.7, 0.7);
+
+      // Majestic Wings spread wide
+      const wingMat = LandmarkModels.whitePlaster;
+      const leftWing = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.8), wingMat);
+      leftWing.position.set(-0.85, 1.1, -0.1);
+      leftWing.rotation.z = 0.45;
+      leftWing.rotation.y = -0.3;
+
+      const rightWing = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.8), wingMat);
+      rightWing.position.set(0.85, 1.1, -0.1);
+      rightWing.rotation.z = -0.45;
+      rightWing.rotation.y = 0.3;
+
+      pegasus.add(body, neck, horseHead, leftWing, rightWing);
+      group.add(pegasus);
+    });
+
+    const billboard = LandmarkModels.createTitleBillboard(
+      '⛵ Muelle de los Pegasos',
+      'Paseo Marítimo & Bahía de las Ánimas',
+      5.6
+    );
+    group.add(billboard);
+
+    return group;
+  }
+
+  /**
+   * 10. Getsemaní: Callejón de las Sombrillas Multicolores
+   */
+  public static buildCallejonSombrillas(): THREE.Group {
+    const group = new THREE.Group();
+
+    // Colonial facade pillars on both sides
+    const leftFacade = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.5, 8.0), LandmarkModels.colonialYellow);
+    leftFacade.position.set(-2.8, 2.25, 0);
+    const rightFacade = new THREE.Mesh(
+      new THREE.BoxGeometry(0.6, 4.5, 8.0),
+      new THREE.MeshLambertMaterial({ color: 0x0284c7 })
+    );
+    rightFacade.position.set(2.8, 2.25, 0);
+    group.add(leftFacade, rightFacade);
+
+    // Wooden balconies
+    const balconyWood = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    [-1.8, 1.8].forEach((z) => {
+      const balcL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.8), balconyWood);
+      balcL.position.set(-2.3, 2.6, z);
+      const balcR = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.8), balconyWood);
+      balcR.position.set(2.3, 2.6, z);
+      group.add(balcL, balcR);
+    });
+
+    // Canopy of colorful floating umbrellas
+    const umbrellaColors = [
+      0xfacc15, // Yellow
+      0xf43f5e, // Hot Pink
+      0x06b6d4, // Cyan
+      0x84cc16, // Lime
+      0xf97316, // Orange
+      0xa855f7  // Purple
+    ];
+
+    let colorIdx = 0;
+    for (let z = -3.2; z <= 3.2; z += 1.3) {
+      for (let x = -1.6; x <= 1.6; x += 1.05) {
+        const umbrella = new THREE.Group();
+        umbrella.position.set(x + (Math.sin(z) * 0.15), 3.4 + (Math.cos(x) * 0.18), z);
+
+        const col = umbrellaColors[colorIdx % umbrellaColors.length];
+        colorIdx++;
+        const canopyMat = new THREE.MeshLambertMaterial({ color: col });
+
+        // Dome
+        const dome = new THREE.Mesh(
+          new THREE.SphereGeometry(0.45, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+          canopyMat
+        );
+        dome.rotation.x = Math.PI; // Opening facing down
+        dome.position.y = 0.2;
+
+        // Stick & Handle
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.45, 6), LandmarkModels.castIron);
+        shaft.position.y = 0.0;
+
+        umbrella.add(dome, shaft);
+        group.add(umbrella);
+      }
+    }
+
+    const billboard = LandmarkModels.createTitleBillboard(
+      '🎨 Callejón de las Sombrillas',
+      'El Corazón Cultural y Bohemio de Getsemaní',
+      4.9
+    );
+    group.add(billboard);
+
+    return group;
+  }
 }

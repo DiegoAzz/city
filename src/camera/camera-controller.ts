@@ -84,7 +84,9 @@ export class CameraController {
   }
 
   public zoomOut(delta: number = 0.4): void {
-    const nextZoom = Math.max(15.0, this.map.getZoom() - delta);
+    // In street third-person mode, keep camera close to avatar so world remains immersive like Brookhaven
+    const minZ = this.mode === 'thirdPerson' ? 19.3 : 15.0;
+    const nextZoom = Math.max(minZ, this.map.getZoom() - delta);
     this.map.easeTo({ zoom: nextZoom, duration: 160 });
   }
 
@@ -109,7 +111,36 @@ export class CameraController {
     this.targetLat = lat;
     this.currentLng = lng;
     this.currentLat = lat;
+    this.isCinematic = false;
     this.map.setCenter([lng, lat]);
+
+    // Restore eye-level third-person street view
+    if (this.mode === 'thirdPerson') {
+      this.map.easeTo({
+        pitch: 76,
+        zoom: 20.6,
+        duration: 350
+      });
+    }
+  }
+
+  /**
+   * Instantly teleports camera to any landmark destination in Cartagena
+   * with street-level third-person perspective and optimal orientation.
+   */
+  public teleport(lng: number, lat: number, bearingDeg: number = 30, pitch: number = 76, zoom: number = 20.6): void {
+    this.targetLng = lng;
+    this.targetLat = lat;
+    this.currentLng = lng;
+    this.currentLat = lat;
+    this.mode = 'thirdPerson';
+    this.isCinematic = false;
+    this.map.jumpTo({
+      center: [lng, lat],
+      pitch,
+      zoom,
+      bearing: bearingDeg
+    });
   }
 
   /**

@@ -12,6 +12,7 @@ import type { CollisionSystem } from '../navigation/collision-system';
 import { metersToDeltaDegrees } from '../map/projection/mercator';
 import type { RemodelModal } from './remodel/remodel-modal';
 import type { RemodelManager } from '../remodel/remodel-manager';
+import type { FastTravelModal } from './navigation/fast-travel-modal';
 
 export class Hud {
   private btnCamera: HTMLElement | null = null;
@@ -45,7 +46,8 @@ export class Hud {
     private economy?: EconomyManager,
     private collisionSystem?: CollisionSystem,
     private remodelModal?: RemodelModal,
-    private remodelManager?: RemodelManager
+    private remodelManager?: RemodelManager,
+    private fastTravelModal?: FastTravelModal
   ) {
     this.gameDialog = new GameDialog();
     this.btnCamera = document.getElementById('btn-camera');
@@ -71,10 +73,26 @@ export class Hud {
   }
 
   private bindEvents(): void {
-    // Location badge toggles dev telemetry overlay
-    const locationBadge = document.querySelector('.location-badge');
-    const perfOverlay = document.getElementById('perf-overlay');
-    locationBadge?.addEventListener('click', () => {
+    // Destinos / Fast Travel GPS drawer toggle (from dock button)
+    const btnDockLocation = document.getElementById('btn-dock-location');
+    btnDockLocation?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.soundSystem.playHorn('bicycle');
+      this.fastTravelModal?.toggle();
+    });
+
+    // Destinos button from main options drawer (☰)
+    const btnMenuDestinos = document.getElementById('btn-menu-destinos');
+    btnMenuDestinos?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('flyout-main-menu')?.classList.add('hidden');
+      this.soundSystem.playHorn('bicycle');
+      this.fastTravelModal?.open();
+    });
+
+    // Double-click on dock location toggles dev telemetry overlay
+    btnDockLocation?.addEventListener('dblclick', () => {
+      const perfOverlay = document.getElementById('perf-overlay');
       perfOverlay?.classList.toggle('hidden');
     });
 
