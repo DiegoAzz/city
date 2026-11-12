@@ -68,6 +68,13 @@ export class EconomyManager {
     this.notify();
   }
 
+  public setBalance(amount: number): void {
+    this.balance = Math.max(0, amount);
+    this.saveBalance();
+    this.updateDom();
+    this.notify();
+  }
+
   public onBalanceChange(cb: (newBalance: number) => void): void {
     this.onBalanceChangeCallbacks.push(cb);
   }

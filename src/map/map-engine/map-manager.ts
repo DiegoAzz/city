@@ -49,6 +49,7 @@ export class MapManager {
 
         try {
           this.setup3DBuildings();
+          this.cleanMapClutter();
         } catch (e) {
           console.warn('[MapManager] Notice while setting up 3D buildings:', e);
         }
@@ -165,6 +166,31 @@ export class MapManager {
     if (!this.map) return;
     if (this.map.getLayer('3d-buildings')) {
       this.map.setLayoutProperty('3d-buildings', 'visibility', visible ? 'visible' : 'none');
+    }
+  }
+
+  private cleanMapClutter(): void {
+    if (!this.map) return;
+    try {
+      const style = this.map.getStyle();
+      if (style && style.layers) {
+        style.layers.forEach((layer) => {
+          const id = layer.id.toLowerCase();
+          if (
+            id.includes('housenumber') ||
+            id.includes('house_num') ||
+            id.includes('shield') ||
+            id.includes('road-number') ||
+            id.includes('highway-shield')
+          ) {
+            try {
+              this.map?.setLayoutProperty(layer.id, 'visibility', 'none');
+            } catch {}
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('[MapManager] Notice cleaning map clutter:', e);
     }
   }
 

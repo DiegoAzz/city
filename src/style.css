@@ -91,6 +91,8 @@ html, body {
 
 /* Top bar (Sleek and Compact) */
 .hud-top {
+  position: relative;
+  z-index: 200 !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,9 +102,12 @@ html, body {
 }
 
 .hud-top-left {
+  position: relative;
+  z-index: 201 !important;
   display: flex;
   align-items: center;
   gap: 6px;
+  pointer-events: auto;
 }
 
 .multiplayer-badge {
@@ -228,23 +233,32 @@ html, body {
    ========================================================================== */
 
 .hud-btn-roblox {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.78);
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(15, 23, 42, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
   color: #ffffff;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: transform 0.12s ease, background 0.12s ease;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 202 !important;
+}
+
+.hud-btn-roblox * {
+  pointer-events: none;
 }
 
 .hud-btn-roblox:active {
@@ -342,17 +356,31 @@ html, body {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 52px);
   left: calc(env(safe-area-inset-left) + 12px);
-  z-index: 1200;
-  background: rgba(15, 23, 42, 0.94);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  z-index: 1500 !important;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
   border-radius: 18px;
   padding: 12px 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  min-width: 210px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  min-width: 220px;
   animation: fadeInModal 0.2s ease;
-  pointer-events: auto;
+  pointer-events: auto !important;
+}
+
+.decor-btn-glow {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(15, 23, 42, 0.88) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.decor-pill {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.decor-pill:active {
+  background: rgba(245, 158, 11, 0.3) !important;
+  border-color: #f59e0b !important;
 }
 
 .drawer-header {
@@ -892,13 +920,14 @@ html, body {
 
 /* ==================================================== */
 /* --- INVISIBLE FLOATING JOYSTICK (LEFT 50% ZONE) ---- */
+/* Starts below top bar so it never blocks top menu/chat */
 /* ==================================================== */
 .touch-zone-left {
   position: absolute;
-  top: 0;
+  top: 56px;
   left: 0;
   width: 48vw;
-  height: 100vh;
+  height: calc(100vh - 56px);
   z-index: 12;
   pointer-events: auto;
   touch-action: none;
@@ -1090,21 +1119,21 @@ html, body {
 /* Expandable Chat Drawer */
 .chat-drawer {
   position: absolute;
-  top: calc(var(--safe-top) + 12px);
+  top: calc(var(--safe-top) + 52px);
   left: calc(var(--safe-left) + 12px);
   width: min(340px, calc(100vw - 24px));
-  max-height: calc(100vh - 180px);
-  background: rgba(15, 23, 42, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  max-height: calc(100vh - 70px);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
-  pointer-events: auto;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75);
+  pointer-events: auto !important;
   overflow: hidden;
-  z-index: 100;
+  z-index: 2501 !important;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 

@@ -234,7 +234,35 @@
 
       <!-- Roblox Style Right Edge Menu Strip (Collapsible Dock) -->
       <aside class="roblox-dock-right" aria-label="Menú lateral de acciones">
-        <!-- 1. Vehículos Button & Flyout -->
+        <!-- 1. Decorar Button & Flyout (Fase 6: Catálogo 3D en Vivo) -->
+        <div class="dock-item-wrapper">
+          <button id="btn-dock-decor" class="roblox-dock-btn decor-btn-glow" aria-label="Decorar Ciudad" title="Decorar con Objetos 3D">
+            <span class="dock-icon">🎨</span>
+            <span class="dock-label">Decorar</span>
+          </button>
+
+          <!-- Horizontal Slide-Out Flyout for Decorations -->
+          <div id="flyout-decorations" class="dock-flyout flyout-left hidden">
+            <button class="mode-pill decor-pill" data-item="palm_tree" title="Palmera ($150)">
+              <span class="mode-icon">🌴</span>
+              <span class="mode-text">Palmera</span>
+            </button>
+            <button class="mode-pill decor-pill" data-item="colonial_bench" title="Banco ($100)">
+              <span class="mode-icon">🛋️</span>
+              <span class="mode-text">Banco</span>
+            </button>
+            <button class="mode-pill decor-pill" data-item="street_lamp" title="Farol ($120)">
+              <span class="mode-icon">💡</span>
+              <span class="mode-text">Farol</span>
+            </button>
+            <button class="mode-pill decor-pill" data-item="fountain" title="Fuente ($350)">
+              <span class="mode-icon">⛲</span>
+              <span class="mode-text">Fuente</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Vehículos Button & Flyout -->
         <div class="dock-item-wrapper">
           <button id="btn-dock-vehicle" class="roblox-dock-btn" aria-label="Garaje de Vehículos" title="Garaje">
             <span class="dock-icon">🚗</span>

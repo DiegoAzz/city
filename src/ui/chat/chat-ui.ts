@@ -107,10 +107,19 @@ export class ChatUi {
 
     // Top-bar Multiplayer badge opens the hub
     const btnHub = document.getElementById('btn-multiplayer-hub');
-    btnHub?.addEventListener('click', () => this.toggle());
+    btnHub?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnHub?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggle();
+    });
 
     const btnClose = document.getElementById('btn-chat-close');
     btnClose?.addEventListener('click', () => this.close());
+
+    // Stop propagation inside chat drawer so touches don't bleed through to map or flyouts
+    this.chatDrawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    this.chatDrawer?.addEventListener('click', (e) => e.stopPropagation());
 
     // Copy Invite URL Button
     const btnCopy = document.getElementById('btn-copy-invite');

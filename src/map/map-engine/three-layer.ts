@@ -3,6 +3,7 @@ import maplibregl, { CustomLayerInterface, CustomRenderMethodInput, Map as MapLi
 import { CharacterController } from '../../character/controller/character-controller';
 import type { MultiplayerManager } from '../../multiplayer/multiplayer-manager';
 import type { DecorationManager } from '../../decorations/decoration-manager';
+import { AmbientCitizensManager } from '../../citizens/ambient-citizens';
 
 export class ThreeCharacterLayer implements CustomLayerInterface {
   public id: string = 'three-character-layer';
@@ -16,6 +17,8 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
   private characterController: CharacterController;
   private multiplayerManager: MultiplayerManager | null = null;
   private decorationManager: DecorationManager | null = null;
+  private ambientCitizens: AmbientCitizensManager;
+  private lastTime: number = performance.now();
 
   constructor(characterController: CharacterController) {
     this.characterController = characterController;
@@ -37,6 +40,10 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     // Add character root group to scene
     this.scene.add(this.characterController.rigs.root);
+
+    // Initialize ambient Cartagena citizens (Palenquera, Músico, Policía, Turista)
+    this.ambientCitizens = new AmbientCitizensManager();
+    this.ambientCitizens.setScene(this.scene);
 
     // Disable frustum culling on all meshes
     this.scene.traverse((obj) => {
@@ -98,6 +105,9 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
 
     this.characterController.rigs.root.position.set(0, 0, 0);
 
+    // Visual scale factor matching Mercator scale * 3.8
+    const visualScaleFactor = 3.8;
+
     // Position remote players relative to local character in Three.js coordinate space
     if (this.multiplayerManager) {
       const latRad = (lat * Math.PI) / 180.0;
@@ -110,9 +120,15 @@ export class ThreeCharacterLayer implements CustomLayerInterface {
         const dEastMeters = dLng * metersPerDegLng;
         const dNorthMeters = dLat * metersPerDegLat;
 
-        peer.rigs.root.position.set(dEastMeters, 0, -dNorthMeters);
+        peer.rigs.root.position.set(dEastMeters / visualScaleFactor, 0, -dNorthMeters / visualScaleFactor);
       }
     }
+
+    // Update ambient Cartagena citizens (Palenquera, Músico, Policía, Turista)
+    const now = performance.now();
+    const delta = Math.min((now - this.lastTime) / 1000, 0.1);
+    this.lastTime = now;
+    this.ambientCitizens.update(delta, lng, lat);
 
     // Update 3D decoration positions
     this.decorationManager?.updatePositions(lng, lat);

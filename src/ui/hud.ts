@@ -5,6 +5,9 @@ import { MovementMode } from '../character/model/character-mesh';
 import { PresentationMode } from './presentation-mode';
 import { SoundSystem } from '../audio/sound-system';
 import { GameDialog, DialogOptions } from './dialog/game-dialog';
+import type { DecorationManager } from '../decorations/decoration-manager';
+import { DECORATION_CATALOG } from '../decorations/decoration-manager';
+import type { EconomyManager } from '../economy/economy-manager';
 
 export class Hud {
   private btnCamera: HTMLElement | null = null;
@@ -33,7 +36,9 @@ export class Hud {
     private qualityManager: QualityManager,
     private characterController: CharacterController,
     private presentationMode: PresentationMode,
-    private soundSystem: SoundSystem
+    private soundSystem: SoundSystem,
+    private decorationManager?: DecorationManager,
+    private economy?: EconomyManager
   ) {
     this.gameDialog = new GameDialog();
     this.btnCamera = document.getElementById('btn-camera');
@@ -153,7 +158,8 @@ export class Hud {
       this.cameraController.recenterImmediate(defaultLng, defaultLat);
       this.setVehicleMode('foot');
       this.closeDialog();
-      this.showToast('🎯 Explorador en Plaza Santo Domingo (calle abierta)');
+      document.getElementById('flyout-main-menu')?.classList.add('hidden');
+      this.showToast('🎯 ¡Bienvenido a Plaza Santo Domingo!');
     });
 
     // Space key to Jump
@@ -180,6 +186,8 @@ export class Hud {
     const btnMenu = document.getElementById('btn-roblox-menu');
     const flyoutMenu = document.getElementById('flyout-main-menu');
     const btnMenuClose = document.getElementById('btn-menu-close');
+    const btnDecor = document.getElementById('btn-dock-decor');
+    const flyoutDecorations = document.getElementById('flyout-decorations');
 
     const toggleFlyout = (el: HTMLElement | null, others: (HTMLElement | null)[]) => {
       if (!el) return;
@@ -192,12 +200,48 @@ export class Hud {
       }
     };
 
+    // Decorate dock button & catalog pills
+    btnDecor?.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btnDecor?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFlyout(flyoutDecorations, [flyoutVehicles, flyoutCamera, flyoutMenu]);
+    });
+
+    const decorPills = document.querySelectorAll<HTMLButtonElement>('.decor-pill');
+    decorPills.forEach((pill) => {
+      pill.addEventListener('pointerdown', (e) => e.stopPropagation());
+      pill.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const itemId = pill.getAttribute('data-item');
+        if (!itemId) return;
+
+        const [lng, lat] = this.characterController.getPosition();
+        if (this.decorationManager) {
+          const res = this.decorationManager.placeItem(itemId, lng, lat);
+          if (res.success) {
+            this.soundSystem.playHorn('bicycle');
+            const itemDef = DECORATION_CATALOG.find((d) => d.id === itemId);
+            this.showToast(`✨ ¡${itemDef?.name || 'Objeto'} colocado en la ciudad!`);
+            if (this.economy) {
+              const balanceEl = document.getElementById('player-balance-text');
+              if (balanceEl) balanceEl.textContent = `$${this.economy.getBalance().toLocaleString()}`;
+            }
+            flyoutDecorations?.classList.add('hidden');
+          } else {
+            this.showToast(`⚠️ ${res.reason || 'Saldo insuficiente'}`);
+          }
+        }
+      });
+    });
+
     // Vehicle dock button
     btnVehicle?.addEventListener('pointerdown', (e) => e.stopPropagation());
     btnVehicle?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutVehicles, [flyoutCamera, flyoutMenu]);
+      toggleFlyout(flyoutVehicles, [flyoutCamera, flyoutMenu, flyoutDecorations]);
     });
 
     // Camera dock button
@@ -205,7 +249,7 @@ export class Hud {
     btnCamera?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutCamera, [flyoutVehicles, flyoutMenu]);
+      toggleFlyout(flyoutCamera, [flyoutVehicles, flyoutMenu, flyoutDecorations]);
     });
 
     // Main Roblox Menu (☰)
@@ -213,7 +257,7 @@ export class Hud {
     btnMenu?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleFlyout(flyoutMenu, [flyoutVehicles, flyoutCamera]);
+      toggleFlyout(flyoutMenu, [flyoutVehicles, flyoutCamera, flyoutDecorations]);
     });
 
     btnMenuClose?.addEventListener('click', (e) => {
@@ -223,7 +267,7 @@ export class Hud {
     });
 
     // Prevent touches inside flyouts from closing them
-    [flyoutVehicles, flyoutCamera, flyoutMenu].forEach((f) => {
+    [flyoutVehicles, flyoutCamera, flyoutMenu, flyoutDecorations].forEach((f) => {
       f?.addEventListener('pointerdown', (e) => e.stopPropagation());
       f?.addEventListener('click', (e) => e.stopPropagation());
     });
