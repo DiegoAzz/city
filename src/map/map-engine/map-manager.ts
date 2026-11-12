@@ -195,14 +195,6 @@ export class MapManager {
           'fill-extrusion-opacity': 0.98
         }
       });
-
-      // Interactive Click to inspect & remodel existing buildings
-      this.map.on('click', '3d-buildings', (e) => {
-        if (e.features && e.features.length > 0) {
-          const feat = e.features[0];
-          this.onBuildingClickCallbacks.forEach((cb) => cb(feat, e.lngLat));
-        }
-      });
     } catch (e) {
       console.warn('[MapManager] 3D buildings layer notice:', e);
     }

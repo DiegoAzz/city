@@ -2,8 +2,8 @@ export interface WalletState {
   balance: number;
 }
 
-const STORAGE_KEY = 'city_world_wallet_v1';
-const INITIAL_BALANCE = 1000;
+const STORAGE_KEY = 'city_world_wallet_infinite_v2';
+const INITIAL_BALANCE = 999999999; // $999,999,999 Infinite testing funds
 
 export class EconomyManager {
   private balance: number;
@@ -17,10 +17,12 @@ export class EconomyManager {
   private loadBalance(): number {
     try {
       if (typeof localStorage !== 'undefined') {
+        // Wipe old depleted v1 balance so user gets instant infinite funds
+        localStorage.removeItem('city_world_wallet_v1');
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = parseInt(raw, 10);
-          if (!isNaN(parsed) && parsed >= 0) {
+          if (!isNaN(parsed) && parsed >= 100000) {
             return parsed;
           }
         }
@@ -45,18 +47,18 @@ export class EconomyManager {
     return this.balance;
   }
 
-  public canAfford(amount: number): boolean {
-    return this.balance >= amount;
+  public canAfford(_amount: number): boolean {
+    // Infinite funds: user can always test, remodel, and construct without limits
+    return true;
   }
 
   public deduct(amount: number): boolean {
-    if (amount <= 0) return true;
-    if (this.balance < amount) return false;
-
-    this.balance -= amount;
-    this.saveBalance();
-    this.updateDom();
-    this.notify();
+    if (amount > 0) {
+      this.balance = Math.max(0, this.balance - amount);
+      this.saveBalance();
+      this.updateDom();
+      this.notify();
+    }
     return true;
   }
 
@@ -87,7 +89,8 @@ export class EconomyManager {
     if (typeof document === 'undefined') return;
     const el = document.getElementById('player-balance-text');
     if (el) {
-      el.textContent = `$${this.balance.toLocaleString()}`;
+      el.textContent = '$∞ Ilimitado';
     }
   }
 }
+

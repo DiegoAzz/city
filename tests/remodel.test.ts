@@ -42,8 +42,8 @@ describe('Cartagena Remodel System (Phase 7)', () => {
     expect(economy.getBalance()).toBe(750); // 1000 - 250
   });
 
-  it('prevents remodeling when player balance is insufficient', () => {
-    economy.setBalance(50); // convention costs 250
+  it('allows unlimited remodeling in sandbox mode with infinite funds', () => {
+    economy.setBalance(50);
     const result = remodelManager.remodel({
       id: 'osm_building_102',
       name: 'Centro de Convenciones',
@@ -53,9 +53,8 @@ describe('Cartagena Remodel System (Phase 7)', () => {
       lat: 10.42435
     });
 
-    expect(result.success).toBe(false);
-    expect(result.reason).toContain('Saldo insuficiente');
-    expect(economy.getBalance()).toBe(50);
+    expect(result.success).toBe(true);
+    expect(economy.canAfford(999999)).toBe(true);
   });
 
   it('locates closest remodeled landmark by coordinates', () => {

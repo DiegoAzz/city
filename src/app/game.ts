@@ -170,28 +170,8 @@ export class Game {
       this.mapManager.getThreeLayer()?.setDecorationManager(this.decorationManager);
       this.mapManager.getThreeLayer()?.setRemodelManager(this.remodelManager);
 
-      // Initialize Remodel Modal & Studio for existing architecture
+      // Initialize Remodel Modal & Studio for existing architecture (ONLY opens when clicking "🏛️ Remodelar" button)
       this.remodelModal = new RemodelModal(this.remodelManager, this.soundSystem, this.mapManager);
-
-      // Interactive building tap on the 3D map!
-      this.mapManager.onBuildingClick((feature, lngLat) => {
-        const featId = feature?.id || `bldg_${Math.round((lngLat.lng + 75.55) * 100000)}_${Math.round((lngLat.lat - 10.42) * 100000)}`;
-        const height = feature?.properties?.render_height || feature?.properties?.height || 14;
-
-        let polygon: [number, number][] | undefined = undefined;
-        if (feature?.geometry?.type === 'Polygon' && feature.geometry.coordinates?.[0]) {
-          polygon = feature.geometry.coordinates[0];
-        }
-
-        this.remodelModal?.open({
-          id: String(featId),
-          lng: lngLat.lng,
-          lat: lngLat.lat,
-          height,
-          polygon,
-          titleHint: `🏛️ Edificación Colonial #${featId} · Toca para Remodelar`
-        });
-      });
 
       this.intro.setProgress(80, 'Sincronizando servidores multijugador...');
 
