@@ -17,11 +17,11 @@ export interface CharacterState {
 }
 
 export const SPEED_PRESETS: Record<MovementMode, { base: number; sprint: number }> = {
-  foot: { base: 4.5, sprint: 9.0 },
-  bicycle: { base: 8.5, sprint: 14.0 },
-  motorcycle: { base: 14.0, sprint: 22.0 },
-  car: { base: 16.0, sprint: 25.0 },
-  boat: { base: 18.0, sprint: 28.0 }
+  foot: { base: 8.5, sprint: 16.0 },
+  bicycle: { base: 14.0, sprint: 24.0 },
+  motorcycle: { base: 22.0, sprint: 36.0 },
+  car: { base: 26.0, sprint: 42.0 },
+  boat: { base: 24.0, sprint: 38.0 }
 };
 
 export class CharacterController {
